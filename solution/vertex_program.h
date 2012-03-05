@@ -32,6 +32,7 @@ namespace graphics {
 		 vector3_type& out_color)
 	{
 	    // >> ADD YOUR OWN MAGIC HERE <<
+            //& NO!
 	    out_vertex = in_vertex;
 	    out_color =  in_color;
 	}
@@ -46,6 +47,7 @@ namespace graphics {
 		 vector3_type& out_color)
 	{
 	    // >> ADD YOUR OWN MAGIC HERE <<
+            // NO!
 	    out_vertex = in_vertex;
 	    out_normal = in_normal;
 	    out_color =  in_color;
@@ -76,6 +78,7 @@ namespace graphics {
 		 vector3_type& out_color)
 	{
 	    // >> ADD YOUR OWN MAGIC HERE <<
+            // NO!
 	    out_vertex = this->TransformPoint(state, in_vertex);
 	    out_color =  in_color;
 	}
@@ -90,6 +93,7 @@ namespace graphics {
 		 vector3_type& out_color)
 	{
 	    // >> ADD YOUR OWN MAGIC HERE <<
+            // NO!
 	    out_vertex = this->TransformPoint(state,  in_vertex);
 	    out_normal = this->TransformNormal(state, in_normal);
 	    out_color =  in_color;
@@ -99,18 +103,24 @@ namespace graphics {
 	vector3_type TransformPoint(graphics_state_type const& state, vector3_type const& point)
 	{
 	    // Transform the point using the state.model()
+            // DO MAGIC HERE!
 
-	    vector3_type transformed_point = point;
-	    return transformed_point;
+            vector4_type hom = HomVector(point);
+
+	    vector4_type transformed_point = state.projection() * hom;
+	    return Vector3D(transformed_point);
 	}
 
 	
 	vector3_type TransformNormal(graphics_state_type const& state, vector3_type const& normal)
 	{
 	    // Transform the normal using the state.inv_model()
+            // DO MAGIC HERE!!! :D
 
-	    vector3_type transformed_normal = normal;
-	    return transformed_normal;
+            vector4_type hom = HomVector(normal);
+
+	    vector4_type transformed_normal = state.projection() * hom;
+	    return Vector3D(transformed_normal);
 	}
     };
 
