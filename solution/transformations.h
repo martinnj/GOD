@@ -649,6 +649,10 @@ bool LessThanZero(MyMathTypes::real_type const& value,  double const& epsilon = 
 	MyMathTypes::matrix4x4_type M(Identity());
 
 	// Do your own magic here.
+        M[3][3] = 1/(1+Zmax);
+        M[3][4] = (-Zmax)/(1+Zmax);
+        M[4][3] = -1;
+        M[4][4] = 0;
 
 	return M;
     }
@@ -669,6 +673,10 @@ bool LessThanZero(MyMathTypes::real_type const& value,  double const& epsilon = 
 	}
 
 	// Do your own magic here.
+        M[3][3] = 0;
+        M[3][4] = -1;
+        M[4][3] = -((1+Zmax)/Zmax);
+        M[4][4] = -(1/Zmax);
 
 	return M;
     }
@@ -684,9 +692,10 @@ bool LessThanZero(MyMathTypes::real_type const& value,  double const& epsilon = 
     {
       MyMathTypes::matrix4x4_type window_viewport(Identity());
 	
-	// Do your own magic here.
+      // Do your own magic here.
+      window_viewport = Scale(width/2, height/2,1) * Translate(1,1,0);
 
-	return window_viewport;
+      return window_viewport;
     }
 
 
