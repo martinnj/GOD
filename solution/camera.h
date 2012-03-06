@@ -209,12 +209,6 @@ namespace graphics {
             real_type zmax = -((front_plane-prp[3])/(back_plane-prp[3]));
             real_type zp   = prp[3]/(back_plane-prp[3]);
 
-            /* matrix4x4_type per2par = Identity();
-            per2par[3][3] = 1/(1+zmax);
-            per2par[3][4] = -zmax/(1+zmax);
-            per2par[4][3] = -1;
-            per2par[4][4] = 0;*/
-
             matrix4x4_type per2par = Perspective_to_Parallel(zmax);
 
             ViewProject = per2par * sper * shper * T;
