@@ -28,6 +28,14 @@ namespace graphics {
 	LinearInterpolator() : Interpolator<math_types, value_type>()
 	{
 	    // Do your own magic here
+            this->t_start = 0;
+            this->t_stop = 0;
+            this->t_current = this->t_start;
+            this->Delta_t = 1;
+            this->v_start = value_type();
+            this->v_stop = value_type();
+            this->v_current = this->v_start;
+            this->Delta_v = value_type();            
 
 	    this->v_current = value_type();
 	    this->valid = false;
@@ -79,8 +87,15 @@ namespace graphics {
 	void init(int t_start, int t_stop, value_type const& Vstart, value_type const& Vstop)
         {
 	    // Do your own magic here.
+            this->t_start = t_start;
+            this->t_stop = t_stop;
+            this->t_current = this->t_start;
+            Delta_t = (this->t_start <= this->t_stop) ? 1 : -1;
+            this->v_start = Vstart;
+            this->v_stop = Vstop;
+            this->v_current = this->v_start;
+            this->Delta_v = (v_stop - v_start) / std::fabs(t_stop - t_start);
 
-	    this->v_current = value_type();
 	    this->valid = true;
 	}
 
@@ -93,11 +108,10 @@ namespace graphics {
 
 	value_type const& value() const
 	{
-	  //if (!(this->valid)) {
-	  //    throw std::runtime_error("LinearInterpolator::value(): Invalid State/Not Initialized");
-	  //}
-
-	    return this->v_current;
+            if (!(this->valid)) {
+                throw std::runtime_error("LinearInterpolator::value(): Invalid State/Not Initialized");
+            };
+            return this->v_current;
 	}
 
 
@@ -135,9 +149,9 @@ namespace graphics {
 	bool more_values() const
 	{
             // Do your own magic here.
-	    //return this->valid;
+	    return this->valid;
 
-	    return false;
+	    //return false;
 	}
 
 /*******************************************************************\
@@ -149,8 +163,11 @@ namespace graphics {
 	void next_value()
 	{
 	    // Do your own magic here.
-	   
-	    this->valid = false;
+            if (this->t_current == this->t_stop) {
+                this->valid = false;
+            }
+            this->t_current += this->Delta_t;
+            this->v_current += this->Delta_v;
 	}
 	
 /*******************************************************************\

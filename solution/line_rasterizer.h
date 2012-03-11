@@ -127,6 +127,7 @@ namespace graphics {
 	    this->abs_2dx  = std::abs(this->dx) << 1;
 	    this->abs_2dy  = std::abs(this->dy) << 1;
 
+
 	    // Determine if the line is x-dominat or y-dominant
 	    if (this->abs_2dx > this->abs_2dy) {
 		// The line is x-dominant
@@ -139,10 +140,10 @@ namespace graphics {
 
 
 		// Initialize the normal_interpolator
-		// this->normal_interpolator.init(this->x_start, this->x_stop, this->normal_start, this->normal_stop);
+		//this->normal_interpolator.init(this->x_start, this->x_stop, this->normal_start, this->normal_stop);
 
 		// Initialize the worldpoint_interpolator
-		// this->worldpoint_interpolator.init(this->x_start, this->x_stop, this->worldpoint_start, this->worldpoint_stop);
+		//this->worldpoint_interpolator.init(this->x_start, this->x_stop, this->worldpoint_start, this->worldpoint_stop);
 
 		// Initialize the color_interpolator
 		this->color_interpolator.init(this->x_start, this->x_stop, this->color_start, this->color_stop);
@@ -290,8 +291,8 @@ namespace graphics {
 		throw std::runtime_error("MyLineRasterizer::color():Invalid State/Not Initialized");
 	    }
 
-	    // std::cout << "line_rasterizer::color():color() = " << this->color() << std::endl;
-
+	    //std::cout << "line_rasterizer::color():color() = " << this->color() << std::endl;
+            
 	    return this->color_interpolator.value();
 	}
 
@@ -333,10 +334,10 @@ namespace graphics {
 	{
 	    // Dereference a pointer to a private member function.
 	    // It looks strange, but it is the way to do it!
-	    (this->*innerloop)();
-
 	    this->depth_interpolator.next_value();
 	    this->color_interpolator.next_value();
+	    (this->*innerloop)();
+
      	}
 
 
