@@ -32,7 +32,6 @@ namespace graphics {
 		 vector3_type& out_color)
 	{
 	    // >> ADD YOUR OWN MAGIC HERE <<
-            //& NO!
 	    out_vertex = in_vertex;
 	    out_color =  in_color;
 	}
@@ -47,7 +46,6 @@ namespace graphics {
 		 vector3_type& out_color)
 	{
 	    // >> ADD YOUR OWN MAGIC HERE <<
-            // NO!
 	    out_vertex = in_vertex;
 	    out_normal = in_normal;
 	    out_color =  in_color;
@@ -78,7 +76,6 @@ namespace graphics {
 		 vector3_type& out_color)
 	{
 	    // >> ADD YOUR OWN MAGIC HERE <<
-            // NO!
 	    out_vertex = this->TransformPoint(state, in_vertex);
 	    out_color =  in_color;
 	}
@@ -93,7 +90,6 @@ namespace graphics {
 		 vector3_type& out_color)
 	{
 	    // >> ADD YOUR OWN MAGIC HERE <<
-            // NO!
 	    out_vertex = this->TransformPoint(state,  in_vertex);
 	    out_normal = this->TransformNormal(state, in_normal);
 	    out_color =  in_color;
@@ -102,25 +98,57 @@ namespace graphics {
     private:
 	vector3_type TransformPoint(graphics_state_type const& state, vector3_type const& point)
 	{
-	    // Transform the point using the state.model()
-            // DO MAGIC HERE!
+	    //std::cout << "-->MyTransformVertexProgram::TransformPoint(vector3_type&)" << std::endl;
+	    //std::cout << "   point = (" << point << ")^T" << std::endl;
 
-            vector4_type hom = HomVector(point);
+	    vector4_type hompoint = HomVector(point);
+	    //std::cout << "   hompoint = [" << hompoint << "]^T" << std::endl;
 
-	    vector4_type transformed_point = state.projection() * hom;
-	    return Vector3D(transformed_point);
+	    matrix4x4_type modeltrans = state.model();
+	    //std::cout << "   state.model() = " << modeltrans << std::endl;
+	    
+	    hompoint = modeltrans * hompoint;
+	    //std::cout << "   Model * hompoint = " << hompoint << std::endl;
+
+	    matrix4x4_type M = state.projection();
+	    //std::cout << "   projection =" << M << std::endl;
+
+	    hompoint = M * hompoint;
+	    //std::cout << "   Transformed hompoint = [" << hompoint << "]" << std::endl;
+	    
+	    vector3_type transformed_point = Vector3D(hompoint);
+	    //std::cout << "   Transformed point = [" << transformed_point << "]" << std::endl;
+
+	    //std::cout << "<--MyTransformVertexProgram::TransformPoint(vector3_type&)" << std::endl;
+
+	    return transformed_point;
 	}
 
-	
+	// Beware this only use the graphics_state.model() to transform the normal
 	vector3_type TransformNormal(graphics_state_type const& state, vector3_type const& normal)
 	{
-	    // Transform the normal using the state.inv_model()
-            // DO MAGIC HERE!!! :D
+	    //std::cout << "-->MyTransformVertexProgram::TransformNormal(vector3_type&)" << std::endl;
+	    //std::cout << "   normal = (" << normal << ")^T" << std::endl;
 
-            vector4_type hom = HomVector(normal);
+	    vector4_type homnormal = HomNormal(normal);
+	    //std::cout << "   homnormal = [" << homnormal << "]^T" << std::endl;
 
-	    vector4_type transformed_normal = state.projection() * hom;
-	    return Vector3D(transformed_normal);
+	    matrix4x4_type inv_modeltrans = state.inv_model();
+	    //std::cout << "   state.inv_model() = " << inv_modeltrans << std::endl;
+
+	    matrix4x4_type inv_modeltrans_transpose = inv_modeltrans.T();
+	    //std::cout << "   inv_model.t() = " << inv_modeltrans_transpose << std::endl;
+
+	    homnormal = inv_modeltrans_transpose * homnormal;
+	    //std::cout << "   inv_model_transpose * homnormal = " << homnormal << std::endl;
+
+	    vector3_type transformed_normal = Normal3D(homnormal);
+	    //std::cout << "   Transformed normal = [" << transformed_normal << "]" << std::endl;
+
+
+	    //std::cout << "<--MyTransformVertexProgram::TransformNormal(vector3_type&)" << std::endl;
+
+	    return transformed_normal;
 	}
     };
 

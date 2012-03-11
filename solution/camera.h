@@ -64,69 +64,71 @@ namespace graphics {
 						       vector3_type const& vpn,
 						       vector3_type const& vup)
 	{
-	    matrix4x4_type M(Identity());
-	    
-	    // Do your magic stuff here.
+#if 0
+	    matrix4x4_type M;    // The identity matrix.
+	    M[1][1] = 1, M[1][2] = 0, M[1][3] = 0, M[1][4] = 0;
+	    M[2][1] = 0, M[2][2] = 1, M[2][3] = 0, M[2][4] = 0; 
+	    M[3][1] = 0, M[3][2] = 0, M[3][3] = 1, M[3][4] = 0; 
+	    M[4][1] = 0, M[4][2] = 0, M[4][3] = 0, M[4][4] = 1;
 
-	    matrix4x4_type ViewOrient(M);
-            
+	    return M;
+#else
 
-	    // Rotate so the Eye coordinate system coincides with the World coordinate system
-            //Transelate VRP to origin
-            matrix4x4_type T(M);
-            T = Translate(-vrp);
+	    /// Translate -vrp, and its inverse
+	    matrix4x4_type T    = Translate(-vrp);
+	    matrix4x4_type InvT = Translate(vrp);
 
-            //Rotate so it fits the world system.
-            vector3_type rz, rx, ry;
-            int vpnlen = sqrt(vpn[1]*vpn[1]+vpn[2]*vpn[2]+vpn[3]*vpn[3]);
-            rz = vpn/vpnlen;
+#if PRINT_MATRICES
+	    std::cout << "T(-vrp) = T(" << -vrp << ") = " << T << std::endl;
+	    std::cout << "InvT(" << -vrp << ") = T(" << vrp << ") = " << InvT << std::endl;
+#endif
 
-            vector3_type vupc = Cross(vup, rz);
-            int vupclen = sqrt(vupc[1]*vupc[1]+vupc[2]*vupc[2]+vupc[3]*vupc[3]);
-            rx = vupc/vupclen;
+	    // Rotate so the Eye coordinate system coinsides with the Workd coordinate system
+	    vector3_type n = vpn;
+	    n /= Norm(n);
 
-            vector3_type rzx = Cross(rz,rx);
-            int rzxlen = sqrt(rzx[1]*rzx[1]+rzx[2]*rzx[2]+rzx[3]*rzx[3]);
-            ry = rzx/rzxlen;
-            matrix4x4_type R(M);
-            R[1][1] = rx[1];
-            R[1][2] = rx[2];
-            R[1][3] = rx[3];
-            R[2][1] = ry[1];
-            R[2][2] = ry[2];
-            R[2][3] = ry[3];
-            R[3][1] = rz[1];
-            R[3][2] = rz[2];
-            R[3][3] = rz[3];
+	    vector3_type u = Cross(vup, vpn);
+	    u /= Norm(u);
 
-            ViewOrient = R * T;
-            
+	    vector3_type v = Cross(n, u);
+	    v /= Norm(v);
+
+	    matrix4x4_type R = Identity();
+	    for (int i = 1; i <= 3; ++i) {
+		R[1][i] = u[i];
+		R[2][i] = v[i];
+		R[3][i] = n[i];
+	    }
+
+	    /// and the inverse
+	    matrix4x4_type InvR = R.T();
+
 	    // save x_eye, y_eye, z_eye in graphics_state
-            this->m_state->x_eye_axis() = rx;
-            this->m_state->y_eye_axis() = ry;
-            this->m_state->z_eye_axis() = rz;
-	    
+	    this->Camera<math_types>::m_state->x_eye_axis() = u;
+	    this->Camera<math_types>::m_state->y_eye_axis() = v;
+	    this->Camera<math_types>::m_state->z_eye_axis() = n;
+
 #if PRINT_MATRICES
-	    //std::cout << "R    = " << R << std::endl;
-	    //std::cout << "InvR = R.T() = " << InvR << std::endl;
+	    std::cout << "R    = " << R << std::endl;
+	    std::cout << "InvR = R.T() = " << InvR << std::endl;
 #endif
 
-	    // Save the ViewOrientation matrix in state().
-            this->m_state->view_orientation() = ViewOrient;
+	    matrix4x4_type ViewOrient = R * T;
+	    this->m_state->view_orientation() = ViewOrient;
 
 #if PRINT_MATRICES
-	    //std::cout << "ViewOrient = R * T(-vrp) = " << ViewOrient << std::endl;
+	    std::cout << "ViewOrient = R * T(-vrp) = " << ViewOrient << std::endl;
 #endif
 
-	    // Also, save the inverse ViewOrientation matrix in state().
-            matrix4x4_type invvieworient = Inverse(ViewOrient);
-            this->m_state->inv_view_orientation() = invvieworient;
+	    matrix4x4_type InvViewOrient = InvT * InvR;
+	    this->m_state->inv_view_orientation() = InvViewOrient;
 
 #if PRINT_MATRICES
-	    //std::cout << "InvViewOrient = T(vrp) * R.T() = " << InvViewOrient << std::endl;
+	    std::cout << "InvViewOrient = T(vrp) * R.T() = " << InvViewOrient << std::endl;
 #endif
 
 	    return ViewOrient;
+#endif
 	}
 
 	/**
@@ -145,28 +147,35 @@ namespace graphics {
 						      real_type    const& front_plane,
 						      real_type    const& back_plane)
         {
-	    matrix4x4_type M(Identity());
+#if 0
+	    matrix4x4_type M;    // The identity matrix.
+	    M[1][1] = 1, M[1][2] = 0, M[1][3] = 0, M[1][4] = 0;
+	    M[2][1] = 0, M[2][2] = 1, M[2][3] = 0, M[2][4] = 0; 
+	    M[3][1] = 0, M[3][2] = 0, M[3][3] = 1, M[3][4] = 0; 
+	    M[4][1] = 0, M[4][2] = 0, M[4][3] = 0, M[4][4] = 1;
 
-	    // Do your magic stuff here.
+	    return M;
+#else
+	    // Transform the the user view-volumem the the canonical view-volume
+	    // There are a number of steps:
 
-	    matrix4x4_type ViewProject(M);
+	    // Translate prp to the origin
+	    matrix4x4_type T    = Translate(-prp);
+	    matrix4x4_type InvT = Translate(prp);
 
 #if PRINT_MATRICES
-	    //std::cout << "T(-prp) = T(" << -prp << ") = " << T << std::endl;
+	    std::cout << "T(-prp) = T(" << -prp << ") = " << T << std::endl;
 #endif
-            matrix4x4_type T = Translate(-prp);
-	    // Shear_xy so the view volume is symmetric around the z-axis
-            real_type height = upper_right[2] - lower_left[2];
-            //printf("H = %f\n", height);
-            real_type width = upper_right[1] - lower_left[1];
-            //printf("W = %f\n",width);
-            vector3_type CW;
-            CW[1] = lower_left[1] + (width/2);
-            CW[2] = lower_left[2] + (height/2);
-            CW[3] = 0;
 
-            vector3_type dop = prp - CW;
-            matrix4x4_type shper = XY_Shear(-(dop[1]/dop[3]),-(dop[2]/dop[3])); //step 4
+	    // Shear_xy so the view volume is symmetric around the z-axis
+	    vector2_type tmp = (upper_right + lower_left) / 2.0;
+	    vector3_type cw(tmp[1], tmp[2], 0.0);
+	    vector3_type dop = prp - cw;
+	    real_type Sh_x = - dop[1] / dop[3];
+	    real_type Sh_y = - dop[2] / dop[3];
+
+	    matrix4x4_type Sh_xy    = XY_Shear(Sh_x, Sh_y);
+	    matrix4x4_type InvSh_xy = XY_Shear(-Sh_x, -Sh_y);
 
 #if PRINT_MATRICES
 	    //std::cout << "lower_left  = " << lower_left << std::endl;
@@ -174,57 +183,62 @@ namespace graphics {
 	    //std::cout << "cw  = " << cw  << std::endl;
 	    //std::cout << "prp = " << prp << std::endl;
 	    //std::cout << "dop = prp - cw = " << dop << std::endl;
-	    //std::cout << "Sh_xy(-dop_u/dop_n, -dop_v/dop_n) = Sh_xy("
-	    //	      << - dop[1] / dop[3] << " " << - dop[2] / dop[3] << ") = " << Sh_xy << std::endl;
+	    std::cout << "Sh_xy(-dop_u/dop_n, -dop_v/dop_n) = Sh_xy("
+		      << - dop[1] / dop[3] << " " << - dop[2] / dop[3] << ") = " << Sh_xy << std::endl;
 #endif
 
 
 	    // Scale such that the planes make 45 degrees the z-axis
 	    // First step: scale in x- and y-directions
-                       
+	    vector2_type window_dimensions = upper_right - lower_left;
+	    real_type s_x = 2.0 * prp[3] / window_dimensions[1];
+	    real_type s_y = 2.0 * prp[3] / window_dimensions[2];
+
+	    matrix4x4_type S_xy    = Scale(s_x, s_y, 1.0);
+	    matrix4x4_type InvS_xy = Scale(1.0 / s_x, 1.0 / s_y, 1.0);
 	  
 #if PRINT_MATRICES  
-	    //std::cout << "upper_right - lower_left = [" << window_dimensions << "]^T" << std::endl;
-	    //std::cout << "S(s_x, s_y, 1) = S(" << s_x << " " << s_y << " 1) = " << S_xy << std::endl;
+	    std::cout << "upper_right - lower_left = [" << window_dimensions << "]^T" << std::endl;
+	    std::cout << "S(s_x, s_y, 1) = S(" << s_x << " " << s_y << " 1) = " << S_xy << std::endl;
 #endif
 
 	    // Second step: scale uniformly so the view-volume gets the right dimensions, i.e.
 	    // Scale uniformly so the back plane is mapped to -1.
-            real_type sx = (-2*prp[3])/(width*(back_plane-prp[3]));
-            real_type sy = (-2*prp[3])/(height*(back_plane-prp[3]));
-            real_type sz = -1/(back_plane-prp[3]);
-            matrix4x4_type sper = Scale(sx,sy,sz);
+	    real_type s = -1.0 / (back_plane - prp[3]);
+	    if (Zero(s)) s = 1.0;
+	    matrix4x4_type S_uniform    = Scale(s, s, s);
+	    matrix4x4_type InvS_uniform = Scale(1.0 / s, 1.0 / s, 1.0 / s);
 
 #if PRINT_MATRICES	    
-	    //std::cout << "back_plane = " << back_plane << std::endl;
-	    //std::cout << "prp = [" << prp << "]^T" << std::endl;
-	    //std::cout << "s = " << s << std::endl;
-	    //std::cout << "S_uniform(s) = S(" << s << ") = " << S_uniform << std::endl;
+	    std::cout << "back_plane = " << back_plane << std::endl;
+	    std::cout << "prp = [" << prp << "]^T" << std::endl;
+	    std::cout << "s = " << s << std::endl;
+	    std::cout << "S_uniform(s) = S(" << s << ") = " << S_uniform << std::endl;
 	    
 #endif
 
 	    // Now, transform the perspective view-volume to the parallel view-volume
-	    real_type vrpz = -(prp[3]);
-            real_type zmin = -1;
-            real_type zmax = -((front_plane-prp[3])/(back_plane-prp[3]));
-            real_type zp   = prp[3]/(back_plane-prp[3]);
+	    real_type z_max = - (front_plane - prp[3]) / (back_plane - prp[3]);
 
-            matrix4x4_type per2par = Perspective_to_Parallel(zmax);
-
-            ViewProject = per2par * sper * shper * T;
-
+	    matrix4x4_type Perp2Par    = Perspective_to_Parallel(z_max);
+	    matrix4x4_type InvPerp2Par = InvPerspective_to_Parallel(z_max);
+	    
 #if PRINT_MATRICES
-	    //std::cout << "Perp2Par = " << Perp2Par << std::endl;	    
+	    std::cout << "Perp2Par = " << Perp2Par << std::endl;	    
 #endif
 
+	    matrix4x4_type ViewProject    = Perp2Par * S_uniform * S_xy * Sh_xy * T;
+	    matrix4x4_type InvViewProject = InvT * InvSh_xy * InvS_uniform * InvPerp2Par;
+	    
+	    this->m_state->view_projection()     = ViewProject;
+	    this->m_state->inv_view_projection() = InvViewProject;
+
 #if PRINT_MATRICES
-	    //std::cout << "ViewProject = " << ViewProject << std::endl;
+	    std::cout << "ViewProject = " << ViewProject << std::endl;
 #endif
 
-            this->m_state->view_projection() = ViewProject;
-            matrix4x4_type invproj = Inverse(ViewProject);
-            this->m_state->inv_view_projection() = invproj;
 	    return ViewProject;
+#endif
 	}
 
 
@@ -238,39 +252,47 @@ namespace graphics {
 	                                                      vector3_type const& translation
 							                          = vector3_type(0.0, 0.0, 0.0))
 	{
-	    matrix4x4_type WindowViewport(Identity());
+	    /// The translation and its inverse
 
-	    // Do your magic stuff here.
+	    matrix4x4_type T_wv(Translate(1, 1, 0));
+	    matrix4x4_type InvT_wv(Translate(-1, -1, 0));
 
-	    // The translation and its inverse
-            WindowViewport = Scale(viewport_width/2, viewport_height/2, 1) * Translate(1,1,0);
 #if PRINT_MATRICES
-	    //std::cout << "T_wv(1.0, 1.0, 0.0) = " << T_wv << std::endl;
+	    std::cout << "T_wv(1.0, 1.0, 0.0) = " << T_wv << std::endl;
 #endif
 
 	    /// The scaling and its inverse
+	    matrix4x4_type S_screen(Scale(viewport_width / 2.0, viewport_height / 2.0, 1.0));
+	    matrix4x4_type InvS_screen(Scale(2.0 / viewport_width, 2.0 / viewport_height, 1.0));
 
 #if PRINT_MATRICES
-	    //std::cout << "S_screen("
-	    //	      << viewport_width  / 2.0 << " "
-	    //	      << viewport_height / 2.0 << " "
-	    //	      << 0.0
-	    //	      << ") = " << S_screen << std::endl;
+	    std::cout << "S_screen("
+		      << viewport_width  / 2.0 << " "
+		      << viewport_height / 2.0 << " "
+		      << 0.0
+		      << ") = " << S_screen << std::endl;
 #endif
 
 	    /// The translation on the screen and its inverse
+	    matrix4x4_type T_screen(Translate(translation));
+	    matrix4x4_type InvT_screen(Translate(-translation));
+			
 
 	    /// The final window-viewport transformation
+	    matrix4x4_type WindowViewport = T_screen * S_screen * T_wv;
+	    this->m_state->window_viewport() = WindowViewport;
 
 #if PRINT_MATRICES
-	    //std::cout << "WindowViewport = " << WindowViewport << std::endl;
+	    std::cout << "WindowViewport = " << WindowViewport << std::endl;
 #endif
-            matrix4x4_type invview = Inverse(WindowViewport);
-            this->m_state->window_viewport() = WindowViewport;
-            this->m_state->inv_window_viewport() = invview;
+
+
+	    matrix4x4_type InvWindowViewport = InvT_wv * InvS_screen * InvT_screen;
+	    this->m_state->inv_window_viewport() = InvWindowViewport;
 
 	    return WindowViewport;
 	}
+// #endif
 
 
 	/**
@@ -302,21 +324,18 @@ namespace graphics {
 						 real_type    const& screen_height)
 	{
 	    // ToDo add your magic here!
+#if 0
+	    matrix4x4_type M;    // The identity matrix.
+	    M[1][1] = 1, M[1][2] = 0, M[1][3] = 0, M[1][4] = 0;
+	    M[2][1] = 0, M[2][2] = 1, M[2][3] = 0, M[2][4] = 0; 
+	    M[3][1] = 0, M[3][2] = 0, M[3][3] = 1, M[3][4] = 0; 
+	    M[4][1] = 0, M[4][2] = 0, M[4][3] = 0, M[4][4] = 1;
 
+	    return M;
+#else
 	    matrix4x4_type Id = Identity();
-
-            
-            Id = Id * compute_view_projection_matrix(prp, lower_left, upper_right,
-                                                     front_plane, back_plane);
-            Id = Id * compute_view_orientation_matrix(vrp,vpn,vup);
-            Id = Id * compute_window_viewport_matrix(screen_width, screen_height);
-            compute_window_viewport_matrix(screen_width, screen_height);
-
-            matrix4x4_type invproj = Inverse(Id);
-            this->m_state->projection() = Id;
-            this->m_state->inv_projection() = invproj;
-
 	    return Id;
+#endif
 	}
     };
 

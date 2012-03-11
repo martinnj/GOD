@@ -229,10 +229,9 @@ bool LessThanZero(MyMathTypes::real_type const& value,  double const& epsilon = 
     {
 	MyMathTypes::matrix4x4_type T(Identity());
 
-	// Do your own magic here.
-        T[1][4] = dx;
-        T[2][4] = dy;
-        T[3][4] = dz;
+	T[1][4] = dx;
+	T[2][4] = dy;
+	T[3][4] = dz;
 
 	return T;
     }
@@ -263,10 +262,9 @@ bool LessThanZero(MyMathTypes::real_type const& value,  double const& epsilon = 
     {
 	MyMathTypes::matrix4x4_type invT(Identity());
 
-	// Do your own magic here.
-        invT[1][4] = -dx;
-        invT[2][4] = -dy;
-        invT[3][4] = -dz;
+	invT[1][4] = -dx;
+	invT[2][4] = -dy;
+	invT[3][4] = -dz;
 
 	return invT;
     }
@@ -297,10 +295,9 @@ bool LessThanZero(MyMathTypes::real_type const& value,  double const& epsilon = 
     {
 	MyMathTypes::matrix4x4_type S(Identity());
 
-	// Do your own magic here.
-        S[1][1] = sx;
-        S[2][2] = sy;
-        S[3][3] = sz;
+	S[1][1] = sx;
+	S[2][2] = sy;
+	S[3][3] = sz;
 
 	return S;
     }
@@ -321,10 +318,9 @@ bool LessThanZero(MyMathTypes::real_type const& value,  double const& epsilon = 
 	if ((sx == 0.0) || (sy == 0.0) || (sz == 0.0))
 	    throw std::runtime_error("InvScale(3 x real_type&): one or more of the scale factors are equal to zero");
 	else {
-	    // Do your own magic here.
-        invS[1][1] = 1/sx;
-        invS[2][2] = 1/sy;
-        invS[3][3] = 1/sz;
+	    invS[1][1] = 1.0 / sx;
+	    invS[2][2] = 1.0 / sy;
+	    invS[3][3] = 1.0 / sz;
 	}
 	
 	return invS;
@@ -367,11 +363,10 @@ bool LessThanZero(MyMathTypes::real_type const& value,  double const& epsilon = 
     {
 	MyMathTypes::matrix4x4_type R_x(Identity());
 
-	// Do your own magic here.
-        R_x[2][2] = cos(angle);
-        R_x[2][3] = -sin(angle);
-        R_x[3][2] = sin(angle);
-        R_x[3][3] = cos(angle);
+	R_x[2][2] =  cos(angle);
+	R_x[2][3] = -sin(angle);
+	R_x[3][2] =  sin(angle);
+	R_x[3][3] =  cos(angle);
 
 	return R_x;
     }
@@ -385,15 +380,8 @@ bool LessThanZero(MyMathTypes::real_type const& value,  double const& epsilon = 
 
     MyMathTypes::matrix4x4_type Inv_X_Rotate(MyMathTypes::real_type const& angle)
     {
-        MyMathTypes::matrix4x4_type Inv_R_x(Identity());
-
-	// Do your own magic here.
-        Inv_R_x[2][2] = cos(angle);
-        Inv_R_x[2][3] = sin(angle);
-        Inv_R_x[3][2] = -sin(angle);
-        Inv_R_x[3][3] = cos(angle);
-
-	return Inv_R_x;
+	MyMathTypes::matrix4x4_type R_x = X_Rotate(angle);
+	return R_x.T();
     }
 
 
@@ -407,11 +395,10 @@ bool LessThanZero(MyMathTypes::real_type const& value,  double const& epsilon = 
     {
 	MyMathTypes::matrix4x4_type R_y(Identity());
 
-	// Do your own magic here.
-        R_y[1][1] = cos(angle);
-        R_y[1][3] = sin(angle);
-        R_y[3][1] = -sin(angle);
-        R_y[3][3] = cos(angle);
+	R_y[1][1] =  cos(angle);
+	R_y[1][3] =  sin(angle);
+	R_y[3][1] = -sin(angle);
+	R_y[3][3] =  cos(angle);
 
 	return R_y;
     }
@@ -425,15 +412,8 @@ bool LessThanZero(MyMathTypes::real_type const& value,  double const& epsilon = 
 
     MyMathTypes::matrix4x4_type Inv_Y_Rotate(MyMathTypes::real_type const& angle)
     {
-        MyMathTypes::matrix4x4_type Inv_R_y(Identity());
-
-	// Do your own magic here.
-        Inv_R_y[1][1] = cos(angle);
-        Inv_R_y[1][3] = -sin(angle);
-        Inv_R_y[3][1] = sin(angle);
-        Inv_R_y[3][3] = cos(angle);
-
-	return Inv_R_y;
+	MyMathTypes::matrix4x4_type R_y = Y_Rotate(angle);
+	return R_y.T();
     }
 
 
@@ -448,11 +428,10 @@ bool LessThanZero(MyMathTypes::real_type const& value,  double const& epsilon = 
     {
 	MyMathTypes::matrix4x4_type R_z(Identity());
 
-	// Do your own magic here.
-	R_z[1][1] = cos(angle);
+	R_z[1][1] =  cos(angle);
 	R_z[1][2] = -sin(angle);
-	R_z[2][1] = sin(angle);
-	R_z[2][2] = cos(angle);
+	R_z[2][1] =  sin(angle);
+	R_z[2][2] =  cos(angle);
 
 	return R_z;
     }
@@ -466,15 +445,8 @@ bool LessThanZero(MyMathTypes::real_type const& value,  double const& epsilon = 
 
     MyMathTypes::matrix4x4_type Inv_Z_Rotate(MyMathTypes::real_type const& angle)
     {
-        MyMathTypes::matrix4x4_type Inv_R_z(Identity());
-
-	// Do your own magic here.
-	Inv_R_z[1][1] = cos(angle);
-	Inv_R_z[1][2] = sin(angle);
-	Inv_R_z[2][1] = -sin(angle);
-	Inv_R_z[2][2] = cos(angle);
-
-	return Inv_R_z;
+	MyMathTypes::matrix4x4_type R_z = Z_Rotate(angle);
+	return R_z.T();
     }
 
 
@@ -486,23 +458,29 @@ bool LessThanZero(MyMathTypes::real_type const& value,  double const& epsilon = 
 
     MyMathTypes::matrix4x4_type Rotate(MyMathTypes::real_type    const& angle,
 				       MyMathTypes::vector3_type const& axis)
-    {	
-	MyMathTypes::matrix4x4_type R(Identity());
+    {
+	MyMathTypes::real_type sin_a = sin(angle);
+	MyMathTypes::real_type cos_a = cos(angle);
 	
-	// Do your own magic here.
-        double ux = axis[1];
-        double uy = axis[2];
-        double uz = axis[3];
+	MyMathTypes::real_type u_x = axis[1];
+	MyMathTypes::real_type u_y = axis[2];
+	MyMathTypes::real_type u_z = axis[3];
+	
+	MyMathTypes::matrix4x4_type R(Identity());
+	// First row
+	R[1][1] = u_x * u_x + (1.0 - u_x * u_x) * cos_a;
+	R[1][2] = u_x * u_y * (1.0 - cos_a) - u_z * sin_a;
+	R[1][3] = u_x * u_z * (1.0 - cos_a) + u_y * sin_a;
 
-        R[1][1] = ux*ux + (1 - ux*ux)      * cos(angle);
-        R[1][2] = ux*uy * (1 - cos(angle)) - uz*sin(angle);
-        R[1][3] = ux*ux * (1 - cos(angle)) + uy*sin(angle);
-        R[2][1] = ux*uy * (1 - cos(angle)) + uz*sin(angle);
-        R[2][2] = uy*uy + (1 - uy*uy)      * cos(angle);
-        R[2][3] = uy*uz * (1 - cos(angle)) - ux*sin(angle);
-        R[3][1] = ux*uz * (1 - cos(angle)) - uy*sin(angle);
-        R[3][2] = uy*uz * (1 - cos(angle)) + ux*sin(angle);
-        R[3][3] = uz*uz * (1 - uz*uz)      * cos(angle);
+	// Second row
+	R[2][1] = u_x * u_y * (1.0 - cos_a) + u_z * sin_a;
+	R[2][2] = u_y * u_y + (1.0 - u_y * u_y) * cos_a;
+	R[2][3] = u_y * u_z * (1.0 - cos_a) - u_x * sin_a;
+
+	// Third row
+	R[3][1] = u_x * u_z * (1.0 - cos_a) - u_y * sin_a;
+	R[3][2] = u_y * u_z * (1.0 - cos_a) + u_x * sin_a;
+	R[3][2] = u_z * u_z + (1.0 - u_z * u_z) * cos_a;
 
 	return R;
     }
@@ -516,11 +494,7 @@ bool LessThanZero(MyMathTypes::real_type const& value,  double const& epsilon = 
     MyMathTypes::matrix4x4_type InvRotate(MyMathTypes::real_type    const& angle,
 					  MyMathTypes::vector3_type const& axis)
     {
-        MyMathTypes::matrix4x4_type Inv_R(Identity());
-
-	Inv_R = Inverse(Rotate(angle,axis));
-
-	return Inv_R;
+	return Rotate(angle, axis).T();
     }
 
 
@@ -535,9 +509,8 @@ bool LessThanZero(MyMathTypes::real_type const& value,  double const& epsilon = 
     {
 	MyMathTypes::matrix4x4_type XY_shear(Identity());
 
-	// Do your own magic here.
-        XY_shear[1][3] = sh_x;
-        XY_shear[2][3] = sh_y;
+	XY_shear[1][3] = sh_x;
+	XY_shear[2][3] = sh_y;
 
 	return XY_shear;
     }
@@ -554,9 +527,8 @@ bool LessThanZero(MyMathTypes::real_type const& value,  double const& epsilon = 
     {
 	MyMathTypes::matrix4x4_type inv_XY_shear(Identity());
 
-	// Do your own magic here.
-        inv_XY_shear[1][3] = -sh_x;
-        inv_XY_shear[2][3] = -sh_y;
+	inv_XY_shear[1][3] = - sh_x;
+	inv_XY_shear[2][3] = - sh_y;
 
 	return inv_XY_shear;
     }
@@ -573,9 +545,8 @@ bool LessThanZero(MyMathTypes::real_type const& value,  double const& epsilon = 
     {
 	MyMathTypes::matrix4x4_type XZ_shear(Identity());
 
-	// Do your own magic here.
-        XZ_shear[1][2] = sh_x;
-        XZ_shear[3][2] = sh_z;
+	XZ_shear[1][2] = sh_x;
+	XZ_shear[3][2] = sh_z;
 
 	return XZ_shear;
     }
@@ -592,9 +563,8 @@ bool LessThanZero(MyMathTypes::real_type const& value,  double const& epsilon = 
     {
 	MyMathTypes::matrix4x4_type inv_XZ_shear(Identity());
 
-	// Do your own magic here.
-        inv_XZ_shear[1][2] = -sh_x;
-        inv_XZ_shear[3][2] = -sh_z;
+	inv_XZ_shear[1][2] = - sh_x;
+	inv_XZ_shear[3][2] = - sh_z;
 
 	return inv_XZ_shear;
     }
@@ -611,9 +581,8 @@ bool LessThanZero(MyMathTypes::real_type const& value,  double const& epsilon = 
     {
 	MyMathTypes::matrix4x4_type YZ_shear(Identity());
 
-	// Do your own magic here.
-        YZ_shear[2][1] = sh_y;
-        YZ_shear[3][1] = sh_z;
+	YZ_shear[2][1] = sh_y;
+	YZ_shear[3][1] = sh_z;
 
 	return YZ_shear;
     }
@@ -630,9 +599,8 @@ bool LessThanZero(MyMathTypes::real_type const& value,  double const& epsilon = 
     {
 	MyMathTypes::matrix4x4_type inv_YZ_shear(Identity());
 
-	// Do your own magic here.
-        inv_YZ_shear[2][1] = -sh_y;
-        inv_YZ_shear[3][1] = -sh_z;
+	inv_YZ_shear[2][1] = - sh_y;
+	inv_YZ_shear[3][1] = - sh_z;
 
 	return inv_YZ_shear;
     }
@@ -648,11 +616,10 @@ bool LessThanZero(MyMathTypes::real_type const& value,  double const& epsilon = 
     {
 	MyMathTypes::matrix4x4_type M(Identity());
 
-	// Do your own magic here.
-        M[3][3] = 1/(1+Zmax);
-        M[3][4] = (-Zmax)/(1+Zmax);
-        M[4][3] = -1;
-        M[4][4] = 0;
+	M[3][3] =   1.0 / (1.0 + Zmax);
+	M[3][4] = - Zmax / (1.0 + Zmax);
+	M[4][3] = - 1.0;
+	M[4][4] =   0.0;
 
 	return M;
     }
@@ -672,11 +639,10 @@ bool LessThanZero(MyMathTypes::real_type const& value,  double const& epsilon = 
 	    throw std::runtime_error("InvPerspective_to_Parallel(real_type&): The matrix is not invertable, because Zmax == 0");
 	}
 
-	// Do your own magic here.
-        M[3][3] = 0;
-        M[3][4] = -1;
-        M[4][3] = -((1+Zmax)/Zmax);
-        M[4][4] = -(1/Zmax);
+	M[3][3] =  0.0;
+	M[3][4] = -1.0;
+	M[4][3] = -(1.0 + Zmax) / Zmax;
+	M[4][4] = -1.0 / Zmax;
 
 	return M;
     }
@@ -690,12 +656,11 @@ bool LessThanZero(MyMathTypes::real_type const& value,  double const& epsilon = 
     MyMathTypes::matrix4x4_type Window_ViewPort(MyMathTypes::real_type const& width,
 						MyMathTypes::real_type const& height)
     {
-      MyMathTypes::matrix4x4_type window_viewport(Identity());
+	MyMathTypes::matrix4x4_type window_viewport;
 	
-      // Do your own magic here.
-      window_viewport = Scale(width/2, height/2,1) * Translate(1,1,0);
+	window_viewport = Scale(width / 2.0, height / 2.0, 1.0) * Translate(1.0, 1.0, 0.0);
 
-      return window_viewport;
+	return window_viewport;
     }
 
 
