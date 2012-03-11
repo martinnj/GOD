@@ -357,6 +357,22 @@ void DrawPoint()
 	    render_pipeline.draw_point(point, cred);
 	}
     }
+
+
+    /* Martin debug code!!! :D 
+     * tegner en streg der går gennem firkanterne 
+     */
+    
+    render_pipeline.load_rasterizer( line_rasterizer );
+    render_pipeline.load_vertex_program(identity_vertex_program);
+    render_pipeline.load_fragment_program(identity_fragment_program);
+    MyMathTypes::vector3_type p1, p2, c1, c2;
+    p1 = MyMathTypes::vector3_type(150,600,-0);
+    p2 = MyMathTypes::vector3_type(750,100,-1);
+    c1 = cblack;
+    c2 = cwhite;
+    render_pipeline.draw_line(p1,c1,p2,c2);
+    
 }
 
 
@@ -924,17 +940,17 @@ void DebugTriangles()
     // Many triangles
 
     // The variable v is global, and don't worry about it - display() updates it!
-
+    printf("Drawing 4 triangles\n");
     render_pipeline.draw_triangle(Vertex1[v], ZeroNormal, cwhite,
 				  Vertex2[v], ZeroNormal, cwhite,
 				  Vertex3[v], ZeroNormal, cwhite);
-
+    printf("Drawing grid\n");
     render_pipeline.draw_grid(XSpacing, YSpacing, cblack);
 
     render_pipeline.draw_debugline(Vertex1[v], Vertex2[v], cwhite);
     render_pipeline.draw_debugline(Vertex2[v], Vertex3[v], cwhite);
     render_pipeline.draw_debugline(Vertex3[v], Vertex1[v], cwhite); // was cgreen
- 
+    printf("Going to special cases\n");
     // The very special cases of very small triangles with horizontal edges - there are 4 cases
     MyMathTypes::vector3_type v1;
     MyMathTypes::vector3_type v2;
@@ -944,15 +960,16 @@ void DebugTriangles()
     v1 = MyMathTypes::vector3_type(10.0, 8.0, 0.0);
     v2 = MyMathTypes::vector3_type(11.0, 8.0, 0.0);
     v3 = MyMathTypes::vector3_type(11.0, 9.0, 0.0);
- 
+
     render_pipeline.draw_triangle(v1, ZeroNormal, cwhite, 
                                                             v2, ZeroNormal, cwhite,
                                                             v3, ZeroNormal, cwhite);
- 
+
     render_pipeline.draw_debugline(v1, v2, cwhite);
     render_pipeline.draw_debugline(v2, v3, cwhite);
     render_pipeline.draw_debugline(v3, v1, cwhite);
  
+    printf("Going to case 2\n");
     // case 2
     v1 = MyMathTypes::vector3_type(13.0, 8.0, 0.0);
     v2 = MyMathTypes::vector3_type(14.0, 8.0, 0.0);
