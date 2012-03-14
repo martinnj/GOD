@@ -38,7 +38,10 @@ namespace graphics {
 \*******************************************************************/
 
 	MyTriangleRasterizer() : valid(false), Debug(false)
-	{}
+	{
+	    //std::cout << "-->MyTriangleRasterizer" << std::endl;
+	    //std::cout << "<--MyTriangleRasterizer" << std::endl;
+	}
 
 /*******************************************************************\
 *                                                                   *
@@ -72,99 +75,45 @@ namespace graphics {
 	    // This is a triangle rasterizer
 
 	    // Save the original parameters
-            org_vertex[0] = in_vertex1;
-            org_vertex[1] = in_vertex2;
-            org_vertex[2] = in_vertex3;
-            org_normal[0] = in_normal1;
-            org_normal[1] = in_normal2;
-            org_normal[2] = in_normal3;
-            org_worldpoint[0] = in_worldpoint1;
-            org_worldpoint[1] = in_worldpoint2;
-            org_worldpoint[2] = in_worldpoint3;
-            org_color[0] = in_color1;
-            org_color[1] = in_color2;
-            org_color[2] = in_color3;
+	    this->org_vertex[0] = in_vertex1;
+	    this->org_vertex[1] = in_vertex2;
+	    this->org_vertex[2] = in_vertex3;
 
-            ivertex[0] = in_vertex1;
-            ivertex[1] = in_vertex2;
-            ivertex[2] = in_vertex3;
-
-            int lower_left = LowerLeft(); //returns 0-indexed!
-            int upper_left = UpperLeft();
-            int the_other = 3 - lower_left - upper_left;
-
-            ll = org_vertex[lower_left];
-            ul = org_vertex[upper_left];
-            other = org_vertex[the_other];
-
-            vector3_type e1, e2;
-            e1 = ll - ul;
-            e2 = other - ll;
-            int x1, y1, x2, y2;
-            x1 = e1[1];
-            y1 = e1[2];
-            x2 = e2[1];
-            y2 = e2[2];
-
-            cred = vector3_type(1, 0, 0);
-            cyellow = vector3_type(1, 1, 0);
-            cgreen = vector3_type(0,1,0);
-
-            
-	    if (((x1*y2)-(x2*y1)) < 0) {
-                leftedge.init(ll,ll,ll,org_color[lower_left],
-                              other,other,other,org_color[the_other],
-                              ul,ul,ul,org_color[upper_left]);
-
-                rightedge.init(ll,ll,ll,org_color[lower_left],
-                               ul,ul,ul,org_color[upper_left]);
-            }
-            if  (((x1*y2)-(x2*y1)) > 0){
-                rightedge.init(ll,ll,ll,org_color[lower_left],
-                              other,other,other,org_color[the_other],
-                              ul,ul,ul,org_color[upper_left]);
-
-                leftedge.init(ll,ll,ll,org_color[lower_left],
-                               ul,ul,ul,org_color[upper_left]);
-            }
-
-            
-            x_start = leftedge.x();
-            y_start = leftedge.y();
-            z_start = 0;
-
-            x_current = x_start;
-            y_current = y_start;
-            z_current = z_start;
-
-            x_stop = rightedge.x();
-            y_stop = leftedge.y();
-            z_stop = 0;
-            
-            Nleft = org_normal[lower_left];
-            Nright = org_normal[the_other];
-            Ncurrent = Nleft;
-
-            Worldleft = org_worldpoint[lower_left];
-            Worldright = org_worldpoint[the_other];
-            Worldcurrent = Worldleft;
+	    this->org_normal[0] = in_normal1;
+	    this->org_normal[1] = in_normal2;
+	    this->org_normal[2] = in_normal3;
 	    
-	    // Do your magic stuff here.
-            this->degen = false;
+	    this->org_worldpoint[0] = in_worldpoint1;
+	    this->org_worldpoint[1] = in_worldpoint2;
+	    this->org_worldpoint[2] = in_worldpoint3;
+
+	    this->org_color[0]  = in_color1;
+	    this->org_color[1]  = in_color2;
+	    this->org_color[2]  = in_color3;
+
+	    this->cred    = vector3_type(1.0, 0.0, 0.0);
+	    this->cgreen  = vector3_type(0.0, 1.0, 0.0);
+	    this->cyellow = vector3_type(225.0 / 255.0, 245.0 / 255.0, 6.0 / 255.0);
+
+	    this->color_current = this->org_color[0]; // in_color1;
+//	    std::cout << std::endl;
+//	    std::cout << "triangle_rasterizer::color_current == " << this->color_current << std::endl;
+
 	    if (this->degenerate()) {
 		this->valid = false;
-                this->degen = true;
 		//throw std::runtime_error("MyTriangleRasterizer:: The triangle is degenerate, i.e. all three points are collinear");
 	    }
 	    else {
 		//std::cout << "MyTriangleRasterizer::init(...): Triangle not degenerate" << std::endl;
 		this->initialize_triangle();
 	    }
+//	    this->Debug = false;
+//	    this->print_variables();
 	}
 
+
 /*******************************************************************\
-*                          
-                return;                                         *
+*                                                                   *
 *                         D e b u g O n ( )                         *
 *                                                                   *
 \*******************************************************************/
@@ -213,7 +162,7 @@ namespace graphics {
 
 	bool Degenerate() const
 	{
-            return this->degenerate();
+	    return this->degenerate();
 	}
 
 
@@ -225,9 +174,9 @@ namespace graphics {
 
 	int x() const      
 	{
-            //if (!this->valid) {
-            //    throw std::runtime_error("MyTriangleRasterizer::x(): Invalid State/Not Initialized");
-            //}
+	    if (!this->valid) {
+                throw std::runtime_error("MyTriangleRasterizer::x(): Invalid State/Not Initialized");
+            }
             return this->x_current;
 	}
 
@@ -240,9 +189,9 @@ namespace graphics {
 
 	int y() const
 	{
-            //if (!this->valid) {
-            //    throw std::runtime_error("MyTriangleRasterizer::y(): Invalid State/Not Initialized");
-            //}
+	    if (!this->valid) {
+                throw std::runtime_error("MyTriangleRasterizer::y(): Invalid State/Not Initialized");
+            }
             return this->y_current;
 	}
 
@@ -255,14 +204,13 @@ namespace graphics {
 
 	real_type depth() const     
 	{
-	  //if (!this->valid) {
-	  //    throw std::runtime_error("MyTriangleRasterizer::depth(): Invalid State/Not Initialized");
-	  //}
-
-	  //if (!this->depth_interpolator.more_values()) {
-	  //	throw std::runtime_error("MyTriangleRasterizer::depth(): Invalid depth_interpolator");
-	  //}
-
+	  //	    if (!this->valid) {
+	  //                throw std::runtime_error("MyTriangleRasterizer::depth(): Invalid State/Not Initialized");
+	  //            }
+            //return this->z_current;
+	  //	    if (!this->depth_interpolator.more_values()) {
+	  //		throw std::runtime_error("MyTriangleRasterizer::depth(): Invalid depth_interpolator");
+	  //	    }
 	    return this->depth_interpolator.value();
 	}
 
@@ -275,14 +223,13 @@ namespace graphics {
 
 	vector3_type position() const 
         {
-	  //if (!this->valid) {
-	  //    throw std::runtime_error("MyTriangleRasterizer::position(): Invalid State/Not Initialized");
-	  //}
-
-	  //if (!this->worldpoint_interpolator.more_values()) {
-	  //	throw std::runtime_error("MyEdgeRasterizer::position(): Invalid worldpoint_interpolator");
-	  //}
-
+	  //	    if (!this->valid) {
+	  //                throw std::runtime_error("MyTriangleRasterizer::position(): Invalid State/Not Initialized");
+	  //            }
+	    //return vector3_type(this->x(), this->y(), this->depth());
+	  //	    if (!this->worldpoint_interpolator.more_values()) {
+	  //		throw std::runtime_error("MyEdgeRasterizer::position(): Invalid worldpoint_interpolator");
+	  //	    }
 	    return this->worldpoint_interpolator.value();
 	}
 
@@ -295,14 +242,13 @@ namespace graphics {
 
 	vector3_type const& normal() const     
 	{
-	  //if (!this->valid) {
-	  //    throw std::runtime_error("MyTriangleRasterizer::normal(): Invalid State/Not Iitialized");
-	  //}
-	    
-	  //if (!this->normal_interpolator.more_values()) {
-	  //	throw std::runtime_error("MyTriangleRasterizer::normal(): Invalid normal_interpolator");
-	  //}
-
+	  //	    if (!this->valid) {
+	  //                throw std::runtime_error("MyTriangleRasterizer::normal(): Invalid State/Not Iitialized");
+	  //            }
+	    //return this->Ncurrent;    
+	  //	    if (!this->normal_interpolator.more_values()) {
+	  //		throw std::runtime_error("MyTriangleRasterizer::normal(): Invalid normal_interpolator");
+	  //	    }
 	    return this->normal_interpolator.value();
 	}
 
@@ -315,23 +261,19 @@ namespace graphics {
 
 	vector3_type const& color() const 
 	{
-	  //if (!this->valid) {
-	  //    throw std::runtime_error("MyTriangleRasterizer::color(): Invalid State/Not Initialized");
-	  //}
+	  //	    if (!this->valid) {
+	  //                throw std::runtime_error("MyTriangleRasterizer::color(): Invalid State/Not Initialized");
+	  //            }
 
-	    //vector3_type return_color;
+	    vector3_type return_color;
 	    if (this->Debug) {
-                return this->color_current;
+		return this->color_current;
 	    }
 
-	    //if (!this->color_interpolator.more_values()) {
-	    //	throw std::runtime_error("MyEdgeRasterizer::color(): Invalid color_interpolator");
-	    //}
-            return this->color_current;
-            //TODO: FIXME: OBS: The interpolator should do the coloring!
-            // This is a hack to simulate colors. It will properly fuck
-            // up if vertexes are different colors! :P
-	    //return this->color_interpolator.value();
+	    //	    if (!this->color_interpolator.more_values()) {
+	    //		throw std::runtime_error("MyEdgeRasterizer::color(): Invalid color_interpolator");
+	    //	    }
+	    return this->color_interpolator.value();
 	}
 
 
@@ -377,10 +319,7 @@ namespace graphics {
 
 	bool more_fragments() const 
 	{
-            bool left = leftedge.more_fragments();
-            bool right = rightedge.more_fragments();
-
-            return (left && right && !this->degen );
+	    return this->valid;
 	}
 
 
@@ -392,26 +331,32 @@ namespace graphics {
 
 	void next_fragment()    
 	{
-	    // Do your magic stuff here
-            if(x_current < x_stop - 1) {
-                x_current++;
-            } else {
-                if (leftedge.more_fragments()) {
-                    leftedge.next_fragment();
-                    rightedge.next_fragment();
-                    x_start = leftedge.x();
-                    x_current = x_start;
-                    x_stop = rightedge.x();
-                    y_current = leftedge.y();
-                } else {
-                    this->valid = false;
-                }
-            }
-            SearchForNonEmptyScanline();
-            if( Debug ) {
-                this->choose_color(x_current);
-            }
-        }
+	    // The new algorithm - and it does work for horizontal bottom lines!
+
+	    if (this->x_current < this->x_stop) {
+		this->x_current += 1;
+
+		this->depth_interpolator.next_value();
+		this->normal_interpolator.next_value();
+		this->worldpoint_interpolator.next_value();
+		this->color_interpolator.next_value();
+	    }
+	    else {
+		// this->x_current >= this->x_stop, so find the next NonEmptyScanline
+		this->valid = this->SearchForNonEmptyScanline();
+	    }
+// This must be changed
+	    if (this->Debug) {
+//		std::cout << "triangle_rasterizer::choose_color(int)" << std::endl;
+		this->choose_color(this->x_current);
+	    }
+	    else {
+//		std::cout << "Get the right color" << std::endl;
+		this->color_current = this->org_color[0];
+	    }
+
+	    this->valid = this->leftedge.more_fragments();
+	}
 
 
 
@@ -427,25 +372,172 @@ namespace graphics {
 
 	void initialize_triangle()
 	{
-	    // Do your magic stuff here.
-            while (x_current >= x_stop && leftedge.more_fragments()) {
-                next_fragment();
-            }
+	    //std::cout << "-->MyTriangleRasterizer::initialize_triangle()" << std::endl;
 
+	    // Maybe the problem is here
+	    //this->color_current = this->org_color[0];
 
-	    if (this->Debug) {
-	    	this->choose_color(this->x_current); // this->org_color[0];  // this->cgreen;
+	    this->lower_left = this->LowerLeft();
+	    this->upper_left = this->UpperLeft();
+	    this->the_other  = 3 - lower_left - upper_left;
+            // Let ll be the integer representation of the lower_left vertex of the triangle,
+	    // disregarding the z-component.
+	    vector3_type ll(static_cast<int>(round(this->org_vertex[this->lower_left][1])),
+			    static_cast<int>(round(this->org_vertex[this->lower_left][2])),
+			    0);
+
+            // Let ul be the integer representation of the upper_left vertex of the triangle,
+	    // disregarding the z-component.
+	    vector3_type ul(static_cast<int>(round(this->org_vertex[this->upper_left][1])),
+			    static_cast<int>(round(this->org_vertex[this->upper_left][2])),
+			    0);
+
+            // Let ot be the integer representation of the the_other vertex of the triangle,
+	    // disregarding the z-component.
+	    vector3_type ot(static_cast<int>(round(this->org_vertex[this->the_other][1])),
+			    static_cast<int>(round(this->org_vertex[this->the_other][2])),
+			    0);
+
+#if 0
+	    std::cout << "MyTriangleRaserizer::initialize_triangle():" << std::endl;
+	    std::cout << "    ll == [" << ll << "]" << std::endl;
+	    std::cout << "    ul == [" << ul << "]" << std::endl;
+	    std::cout << "    ot == [" << ot << "]" << std::endl;
+	    std::cout << std::endl;
+#endif
+
+            // Let u be the vector from 'lower_left' to 'upper_left' vertices.
+	    vector3_type u(ul - ll);
+	    
+	    // Let v be the vector from 'lower_left' to 'the_other'.
+	    vector3_type v(ot - ll);
+
+	    // If the cross product (u x v) has a positive 
+	    // z-component then the point 'the_other' is to the left of u, else it is to the
+	    // right of u.
+	    real_type z_component_of_the_cross_product = u[1] * v[2]- u[2] * v[1];
+	    
+	    if (Zero(z_component_of_the_cross_product)) {
+		std::cout << "MyTriangleRasterizer::initialize_triangle(): The triangle is degenerate" << std::endl;
+		//throw std::runtime_error("The triangle is degenerate");
+	    }
+
+	    if (z_component_of_the_cross_product > 0) {
+		// The vertex the_other is to the left of the longest vector u.
+		// Therefore, the leftedge has two edges associated to it
+		// (lower_left -> the_other), and (the_other -> upper_left),
+		// while the right edge has only one (lower_left -> upper_left).
+
+		// Here there is no need to check for a horizontal edge, because it
+		// would be a top/bottom edge, and therefore it would not be drawn anyway.
+
+		this->leftedge.init(this->org_vertex[this->lower_left],    // first vertex
+				    this->org_normal[this->lower_left],
+				    this->org_worldpoint[this->lower_left],
+				    this->org_color[this->lower_left],
+				    this->org_vertex[this->the_other],     // second vertex
+				    this->org_normal[this->the_other],
+				    this->org_worldpoint[this->the_other],
+				    this->org_color[this->the_other],
+				    this->org_vertex[this->upper_left],    // third vertex
+				    this->org_normal[this->upper_left],
+				    this->org_worldpoint[this->upper_left],
+				    this->org_color[this->upper_left]);
+
+		this->rightedge.init(this->org_vertex[this->lower_left],   // first vertex
+				     this->org_normal[this->lower_left],
+				     this->org_worldpoint[this->lower_left],
+				     this->org_color[this->lower_left],
+				     this->org_vertex[this->upper_left],   // second vertex
+				     this->org_normal[this->upper_left],
+				     this->org_worldpoint[this->upper_left],
+				     this->org_color[this->upper_left]);
 	    }
 	    else {
-		// "Get the right color"
+                // The vertex the_other is to the right of the longest vector u.
+		// Therefore, the leftedge has only one edge assigned to it
+		// (lower_left -> upper_left), while the  rightedge has two edges 
+		// associated to it (lower_left -> the_other), and (the_other -> upper_left).
+
+		// Here there is no need to check for a horizontal edge, because it
+		// would be a top/bottom edge, and therefore it would not be drawn anyway.
+
+		this->leftedge.init(this->org_vertex[this->lower_left],    // first vertex
+				    this->org_normal[this->lower_left],
+				    this->org_worldpoint[this->lower_left],
+				    this->org_color[this->lower_left],
+				    this->org_vertex[this->upper_left],    // second vertex
+				    this->org_normal[this->upper_left],
+				    this->org_worldpoint[this->upper_left],
+				    this->org_color[this->upper_left]);
+
+		this->rightedge.init(this->org_vertex[this->lower_left],   // first vertex
+				     this->org_normal[this->lower_left],
+				     this->org_worldpoint[this->lower_left],
+				     this->org_color[this->lower_left],
+				     this->org_vertex[this->the_other],    // second vertex
+				     this->org_normal[this->the_other],
+				     this->org_worldpoint[this->the_other],
+				     this->org_color[this->the_other],
+				     this->org_vertex[this->upper_left],   // third vertex
+				     this->org_normal[this->upper_left],
+				     this->org_worldpoint[this->upper_left],
+				     this->org_color[this->upper_left]);
+	    }
+
+	    // Now the leftedge and rightedge `edge_rasterizers' are initialized, so they are
+	    // ready for use.
+
+	    this->x_start   = this->leftedge.x();
+	    this->y_start   = this->leftedge.y();
+	    this->z_start   = this->leftedge.depth();
+
+	    this->x_current = this->x_start;
+	    this->y_current = this->y_start;
+	    this->z_current = this->z_start;
+
+	    this->x_stop    = this->rightedge.x() - 1;
+	    this->y_stop    = static_cast<int>(round(this->org_vertex[this->upper_left][2]));
+	    this->z_stop    = this->rightedge.depth();
+
+	    // Now, the vertices and edges are in place, go initialize the interpolators
+
+	    // Depth Interpolator
+	    this->depth_interpolator.init(this->x_start, this->x_stop,
+	    				  this->leftedge.depth(), this->rightedge.depth());
+
+            // Normal Interpolator
+	    this->normal_interpolator.init(this->x_start, this->x_stop,
+	    				   this->leftedge.normal(),  this->rightedge.normal());
+
+	    // World Point Interpolator
+	    this->worldpoint_interpolator.init(this->x_start, this->x_stop,
+	    				       this->leftedge.position(), this->rightedge.position());
+
+            // Color Interpolator
+	    this->color_interpolator.init(this->x_start, this->x_stop,
+	    				  this->leftedge.color(), this->rightedge.color());
+
+
+
+	    this->valid = true;    // necessary?
+
+// This must be changed
+	    if (this->Debug) {
+		this->choose_color(this->x_start); // this->org_color[0];  // this->cgreen;
+	    }
+	    else {
+//		std::cout << "Get the right color" << std::endl;
 		this->color_current = this->org_color[0];
 	    }
-	    if (this->x_start < this->x_stop - 1 && this->valid != false)
-	        this->valid = true;
+
+	    if (this->x_current <= this->x_stop)
+		this->valid = true;
 	    else {
 		// Should only be called if the scanline is empty
-		this->valid = this->valid && this->SearchForNonEmptyScanline();
-            }
+		this->valid = this->SearchForNonEmptyScanline();
+	    }
+	    //std::cout << "<--MyTriangleRasterizer::initialize_triangle()" << std::endl;
 	}
 
 /*******************************************************************\
@@ -458,17 +550,44 @@ namespace graphics {
 
 	bool degenerate()
 	{
+	    bool result = false;
 
-	    vector3_type e1, e2;
-            e1 = ll - ul;
-            e2 = other - ll;
-            int x1, y1, x2, y2;
-            x1 = e1[1];
-            y1 = e1[2];
-            x2 = e2[1];
-            y2 = e2[2];
-            
-	    return (((x1 * y2) - (x2 * y1)) == 0);
+	    vector3_type int_vertex1(static_cast<int>(round(this->org_vertex[0][1])),
+				     static_cast<int>(round(this->org_vertex[0][2])),
+				     0);
+	    vector3_type int_vertex2(static_cast<int>(round(this->org_vertex[1][1])),
+				     static_cast<int>(round(this->org_vertex[1][2])),
+				     0);
+	    vector3_type int_vertex3(static_cast<int>(round(this->org_vertex[2][1])),
+				     static_cast<int>(round(this->org_vertex[2][2])),
+				     0);
+
+	    vector3_type u(int_vertex2 - int_vertex1);
+	    vector3_type v(int_vertex3 - int_vertex1);
+
+	    real_type z_component_of_the_cross_product = u[1] * v[2] - u[2] * v[1];
+
+#if 0
+	    vector3_type cross_product = Cross(int_vertex2 - int_vertex1,
+					       int_vertex3 - int_vertex1);
+	    vector3_type zero_vector(0, 0, 0);
+#endif
+	    if (Zero(z_component_of_the_cross_product)) {
+		std::cout << "triangle_rasterizer::degenerate():The triangle is degenerate" << std::endl;
+		std::cout << "    vertex[1] = [" << int_vertex1 << "]" << std::endl;
+		std::cout << "    vertex[2] = [" << int_vertex2 << "]" << std::endl;
+		std::cout << "    vertex[3] = [" << int_vertex3 << "]" << std::endl;
+		std::cout << "    This triangle will be ignored..."    << std::endl;
+		
+		// Look here tomorrow: 26.03.2010-05:05
+		// Try to use render_pipeline.draw_debugline(...) to mark it in red.
+		// But the render_pipeline must be given as a parameter to the constructor, and
+		// saved in a private variable.
+
+		result = true;
+	    }
+
+	    return result;
 	}
 
 
@@ -483,20 +602,37 @@ namespace graphics {
 	// x-coordinate is chosen.
 	// The computations should be done in integer coordinates.
 	int LowerLeft()
-        {
-            int ll = 0;
-            for (int i = ll + 1; i < 3; ++i) {
-                if ((this->ivertex[i][2] < this->ivertex[ll][2])
-                    ||
-                    ((this->ivertex[i][2] == this->ivertex[ll][2])
-                     &&
-                     (this->ivertex[i][1] < this->ivertex[ll][1])
-                     )
-                    )
-                    { ll = i; }
-            }
-            return ll;
-        }
+	{
+	    int ll = 0;
+	    for (int i = ll + 1; i < 3; ++i) {
+		if
+		    (
+			(
+			    static_cast<int>(round(this->org_vertex[i][2]))
+			    < 
+			    static_cast<int>(round(this->org_vertex[ll][2]))
+			)
+			||
+			(
+			    (
+				static_cast<int>(round(this->org_vertex[i][2]))
+				==
+				static_cast<int>(round(this->org_vertex[ll][2]))
+			    )
+			    &&
+			    (
+				static_cast<int>(round(this->org_vertex[i][1]))
+				<
+				static_cast<int>(round(this->org_vertex[ll][1]))
+			    )
+			)
+		    )
+		{
+		    ll = i;
+		}
+	    }
+	    return ll;
+	}
 
 
 /*******************************************************************\
@@ -510,21 +646,37 @@ namespace graphics {
 	// x-coordinate is chosen.
 	// The computations should be done in integer coordinates.
 	int UpperLeft()
-        {
-            int ul = 0;
-            for (int i = ul + 1; i < 3; ++i) {
-                if ((this->ivertex[i][2] > this->ivertex[ul][2])
-                    ||
-                    ((this->ivertex[i][2] == this->ivertex[ul][2])
-                     &&
-                     (this->ivertex[i][1] < this->ivertex[ul][1])
-                     )
-                    )
-                    { ul = i; }
-            }
-            return ul;
-        }
-
+	{
+	    int ul = 0;
+	    for (int i = ul + 1; i < 3; ++i) {
+		if
+		    (
+			(
+			    static_cast<int>(round(this->org_vertex[i][2]))
+			    >
+			    static_cast<int>(round(this->org_vertex[ul][2]))
+			)
+			||
+		        (
+			    (
+				static_cast<int>(round(this->org_vertex[i][2]))
+				==
+				static_cast<int>(round(this->org_vertex[ul][2]))
+			    )
+			    &&
+			    (
+				static_cast<int>(round(this->org_vertex[i][1]))
+				<
+				static_cast<int>(round(this->org_vertex[ul][1]))
+			    )
+			)
+		    )
+		{
+		    ul = i;
+		}
+	    }
+	    return ul;
+	}
 
 
 /*******************************************************************\
@@ -535,23 +687,114 @@ namespace graphics {
 
 	bool SearchForNonEmptyScanline()
 	{
+	    //std::cout << "-->SearchForNonEmptyScanline()" << std::endl;
+
 	    // Assumes that the current scanline is empty!
-	    //this->valid = false;
-	    // Do your matic stuff here.
-            
-            if (x_current >= x_stop - 1) {
-                this->valid = false;
-            }
-            //if (leftedge.more_fragments()) {
-            //    this->valid = true;
-            //}
-            while (x_current >= x_stop && leftedge.more_fragments()) {
-                next_fragment();
-                if (!leftedge.more_fragments()) {
-                    this->degen = true;
-                }
-            }
-            
+	    this->valid = false;
+	    this->leftedge.next_fragment();
+	    this->rightedge.next_fragment();
+
+	    this->valid = (this->leftedge.more_fragments()) && (this->rightedge.more_fragments());
+
+	    bool NonEmptyScanlineFound = false;
+	    while (!NonEmptyScanlineFound && this->valid) {
+		this->x_start   = this->leftedge.x();
+		this->x_current = this->x_start;
+		this->y_current = this->leftedge.y();
+
+		this->x_stop    = this->rightedge.x() - 1;
+
+		//std::cout << "scanline: " << this->y_current
+		//	  << " [" << this->x_start << ", " << this->x_stop << "]" << std::endl;
+
+		if (this->x_current <= this->x_stop) {
+		    //std::cout << "   SearchForNonEmptyScanline():NonEmpty scanline found" << std::endl;
+		    NonEmptyScanlineFound = true;
+
+		    this->x_start   = this->leftedge.x();
+		    this->x_stop    = this->rightedge.x();
+		    this->x_current = this->x_start;
+
+		    //std::cout << "Scanline y = " << this->y_current << ", (x_l, x_r) = ("
+		    //	      << this->x_start << ", " << this->x_stop << ")" << std::endl;
+
+		    // Initialize the interpolators using the new values from the edges.
+
+		    // Depth Interpolator
+#if 0
+		    std::cout << "depth_interpolator.init("
+			      << this->x_start << ", "
+			      << this->x_stop
+			      << ")";
+		    std::cout << std::endl;
+#endif
+#if 0
+		    std::cout << "LeftEdge: (x, y, depth)  = ("
+			      << this->leftedge.x() << ", "
+			      << this->leftedge.y() << ", "
+			      << this->leftedge.depth() << ")"
+			      << std::endl;
+		    std::cout << "RightEdge: (x, y, depth) = ("
+			      << this->rightedge.x() << ", "
+			      << this->rightedge.y() << ", "
+			      << this->rightedge.depth() << ")"
+			      << std::endl;
+#endif
+		    this->depth_interpolator.init(this->x_start, this->x_stop,
+		    				  this->leftedge.depth(), this->rightedge.depth());
+		    
+		    // Normal Interpolator
+		    //std::cout << "Now the normals" << std::endl;
+		    this->normal_interpolator.init(this->x_start, this->x_stop,
+		    				   this->leftedge.normal(),  this->rightedge.normal());
+
+		    // World Point Interpolator
+		    this->worldpoint_interpolator.init(this->x_start, this->x_stop,
+		    				       this->leftedge.position(), this->rightedge.position());
+
+		    // Color Interpolator
+		    this->color_interpolator.init(this->x_start, this->x_stop,
+		    				  this->leftedge.color(), this->rightedge.color());
+
+		    this->valid = true;
+		}
+		else {
+		    NonEmptyScanlineFound = false;
+		    this->leftedge.next_fragment();
+		    this->rightedge.next_fragment();
+		    this->valid =
+			(this->leftedge.more_fragments()) && (this->rightedge.more_fragments());
+		}
+	    }
+	
+	    if (this->valid) {
+		this->y_current = this->leftedge.y();
+		this->x_start   = this->leftedge.x();
+		this->x_current = this->x_start;
+		this->x_stop    = this->rightedge.x() - 1;
+
+		this->z_start   = this->leftedge.depth();
+		this->z_current = this->z_start;
+		this->z_stop    = this->rightedge.depth();
+
+		this->Nleft     = this->leftedge.normal();
+		this->Ncurrent  = this->Nleft;
+		this->Nright    = this->rightedge.normal();
+		
+		this->Worldleft    = this->leftedge.position();
+		this->Worldcurrent = this->Worldleft;
+		this->Worldright   = this->rightedge.position();
+
+		this->color_left    = this->leftedge.color();
+		this->color_current = this->color_left;
+		this->color_right   = this->rightedge.color();
+
+		if (this->Debug) {
+		    this->choose_color(this->x_start);
+		}
+	    }
+	    //std::cout << "<--SearchForNonEmptyScanline()" << std::endl;
+
 	    return this->valid;
 	}
 
@@ -570,16 +813,18 @@ namespace graphics {
 	    //    xstop   : red
 	    // This is like a trafic-light: green->go ahead, yellow->be carefull, red->stop!
 
+	    //std::cout << "-->triangle_rasterizer::choose_color(int)" << std::endl;
+
 	    this->color_current = this->cyellow;
-            if (x == this->x_stop - 1) {
-	    	this->color_current = this->cred;
+	    if (x == this->x_stop) {
+		this->color_current = this->cred;
 	    }
 	    if (x == this->x_start) {
-	    	this->color_current = this->cgreen;
+		this->color_current = this->cgreen;
 	    }
+
+	    //std::cout << "<--triangle_rasterizer::choose_color(int)" << std::endl;
 	}
-
-
 
 
 /*******************************************************************\
@@ -602,10 +847,6 @@ namespace graphics {
 
 	// The original vertex colors
 	vector3_type org_color[3];
-
-        // inserted from slide, used to calculate ll, ul etc.
-        vector3_type ivertex[3];
-
 
 	// Indices into the vertex table
 	int lower_left;
@@ -642,11 +883,6 @@ namespace graphics {
 	vector3_type cgreen;
 	vector3_type cyellow;
 
-        //added for my own amusement
-        vector3_type ll;
-        vector3_type ul;
-        vector3_type other;
-
 	MyEdgeRasterizer<math_types> leftedge;
 	MyEdgeRasterizer<math_types> rightedge;
 
@@ -663,7 +899,6 @@ namespace graphics {
 	LinearInterpolator<math_types, typename math_types::vector3_type> color_interpolator;
 
 	bool valid;
-        bool degen;
     };
 
 }// end namespace graphics

@@ -94,7 +94,9 @@ namespace graphics {
             this->v_start = Vstart;
             this->v_stop = Vstop;
             this->v_current = this->v_start;
-            this->Delta_v = (v_stop - v_start) / std::fabs(t_stop - t_start);
+            if (t_stop != t_start) {
+                this->Delta_v = (v_stop - v_start) / std::fabs(t_stop - t_start);
+            }
 
 	    this->valid = true;
 	}
@@ -108,9 +110,9 @@ namespace graphics {
 
 	value_type const& value() const
 	{
-            if (!(this->valid)) {
-                throw std::runtime_error("LinearInterpolator::value(): Invalid State/Not Initialized");
-            };
+            //if (!(this->valid)) {
+            //    throw std::runtime_error("LinearInterpolator::value(): Invalid State/Not Initialized");
+            //};
             return this->v_current;
 	}
 
