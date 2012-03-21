@@ -417,10 +417,10 @@ namespace graphics {
 	    // right of u.
 	    real_type z_component_of_the_cross_product = u[1] * v[2]- u[2] * v[1];
 	    
-	    if (Zero(z_component_of_the_cross_product)) {
+	    /*if (Zero(z_component_of_the_cross_product)) {
 		std::cout << "MyTriangleRasterizer::initialize_triangle(): The triangle is degenerate" << std::endl;
 		//throw std::runtime_error("The triangle is degenerate");
-	    }
+                }*/
 
 	    if (z_component_of_the_cross_product > 0) {
 		// The vertex the_other is to the left of the longest vector u.
@@ -573,11 +573,11 @@ namespace graphics {
 	    vector3_type zero_vector(0, 0, 0);
 #endif
 	    if (Zero(z_component_of_the_cross_product)) {
-		std::cout << "triangle_rasterizer::degenerate():The triangle is degenerate" << std::endl;
+		/*std::cout << "triangle_rasterizer::degenerate():The triangle is degenerate" << std::endl;
 		std::cout << "    vertex[1] = [" << int_vertex1 << "]" << std::endl;
 		std::cout << "    vertex[2] = [" << int_vertex2 << "]" << std::endl;
 		std::cout << "    vertex[3] = [" << int_vertex3 << "]" << std::endl;
-		std::cout << "    This triangle will be ignored..."    << std::endl;
+		std::cout << "    This triangle will be ignored..."    << std::endl;*/
 		
 		// Look here tomorrow: 26.03.2010-05:05
 		// Try to use render_pipeline.draw_debugline(...) to mark it in red.

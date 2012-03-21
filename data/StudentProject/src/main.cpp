@@ -177,10 +177,6 @@ typedef enum { ControlGrid = 1, ShadedPatch = 2 } DrawStyle;
 
 using namespace graphics;
 
-typedef RowVector<MyMathTypes::vector3_type, 4> bezier_curve;
-typedef ColumnVector<MyMathTypes::vector3_type, 4> vectorfwd_type;
-
-
 MyCamera<MyMathTypes>                  camera;
 RenderPipeline<MyMathTypes>            render_pipeline;
 MyIdentityVertexProgram<MyMathTypes>   identity_vertex_program;
@@ -361,22 +357,6 @@ void DrawPoint()
 	    render_pipeline.draw_point(point, cred);
 	}
     }
-
-
-    /* Martin debug code!!! :D 
-     * tegner en streg der går gennem firkanterne 
-     */
-    
-    render_pipeline.load_rasterizer( line_rasterizer );
-    render_pipeline.load_vertex_program(identity_vertex_program);
-    render_pipeline.load_fragment_program(identity_fragment_program);
-    MyMathTypes::vector3_type p1, p2, c1, c2;
-    p1 = MyMathTypes::vector3_type(150,600,-0);
-    p2 = MyMathTypes::vector3_type(750,100,-1);
-    c1 = cblack;
-    c2 = cwhite;
-    render_pipeline.draw_line(p1,c1,p2,c2);
-    
 }
 
 
@@ -482,7 +462,7 @@ void DrawLines()
     render_pipeline.draw_line( l3, cwhite, l4, cwhite );
     render_pipeline.draw_line( l4, cwhite, l1, cwhite );
 
-    
+
     // Draw a circle
     double Nedges =  50;
     double Radius = 300;
@@ -626,9 +606,11 @@ void DebugLines()
 void DrawTriangles()
 {
     // TestProgram: It tests drawing of triangles.
+
     render_pipeline.load_rasterizer(triangle_rasterizer);
     render_pipeline.load_vertex_program(identity_vertex_program);
     render_pipeline.load_fragment_program(identity_fragment_program);
+
 
 #ifdef NEWTRIANGLES
     // The new test which should show better that the trianles work.
@@ -647,7 +629,9 @@ void DrawTriangles()
     MyMathTypes::vector3_type  c1( 1.0, 0.0, 0.0 );
     MyMathTypes::vector3_type  c2( 1.0, 0.0, 0.0 );
     MyMathTypes::vector3_type  c3( 1.0, 0.0, 0.0 );
-    render_pipeline.draw_triangle(v1,  n1, c1,  v2,  n2, c2,  v3,  n3, c3);
+
+    render_pipeline.draw_triangle(v1,  n1, c1,  v2,  n2, c2,  v3,  n3, c3);    
+
     // Upper triangle
     MyMathTypes::vector3_type  v4( 550.0, 400.0, 0.0 );
     MyMathTypes::vector3_type  v5( 700.0, 700.0, 0.0 );
@@ -685,6 +669,7 @@ void DrawTriangles()
 #else
 
     // Old Triangles
+
     // Lower left triangle with a lower horizontal edge
     MyMathTypes::vector3_type  v1( 100.0, 100.0, 0.0 );
     MyMathTypes::vector3_type  v2( 400.0, 100.0, 0.0 );
@@ -703,7 +688,7 @@ void DrawTriangles()
 				    v2,  n2, cyellow,
 				    v3,  n3, cyellow);    
 #endif
-    
+
     // Upper left triangle with a upper horizontal edge
     MyMathTypes::vector3_type  v4( 100.0, winHeight - v1[2], 0.0 );
     MyMathTypes::vector3_type  v5( 250.0, winHeight - v3[2], 0.0 );
@@ -944,74 +929,16 @@ void DebugTriangles()
     // Many triangles
 
     // The variable v is global, and don't worry about it - display() updates it!
-    printf("Drawing 4 triangles\n");
+
     render_pipeline.draw_triangle(Vertex1[v], ZeroNormal, cwhite,
 				  Vertex2[v], ZeroNormal, cwhite,
 				  Vertex3[v], ZeroNormal, cwhite);
-    printf("Drawing grid\n");
+
     render_pipeline.draw_grid(XSpacing, YSpacing, cblack);
 
     render_pipeline.draw_debugline(Vertex1[v], Vertex2[v], cwhite);
     render_pipeline.draw_debugline(Vertex2[v], Vertex3[v], cwhite);
     render_pipeline.draw_debugline(Vertex3[v], Vertex1[v], cwhite); // was cgreen
-    printf("Going to special cases\n");
-    // The very special cases of very small triangles with horizontal edges - there are 4 cases
-    MyMathTypes::vector3_type v1;
-    MyMathTypes::vector3_type v2;
-    MyMathTypes::vector3_type v3;
- 
-    // case 1
-    v1 = MyMathTypes::vector3_type(10.0, 8.0, 0.0);
-    v2 = MyMathTypes::vector3_type(11.0, 8.0, 0.0);
-    v3 = MyMathTypes::vector3_type(11.0, 9.0, 0.0);
-
-    render_pipeline.draw_triangle(v1, ZeroNormal, cwhite, 
-                                                            v2, ZeroNormal, cwhite,
-                                                            v3, ZeroNormal, cwhite);
-
-    render_pipeline.draw_debugline(v1, v2, cwhite);
-    render_pipeline.draw_debugline(v2, v3, cwhite);
-    render_pipeline.draw_debugline(v3, v1, cwhite);
- 
-    printf("Going to case 2\n");
-    // case 2
-    v1 = MyMathTypes::vector3_type(13.0, 8.0, 0.0);
-    v2 = MyMathTypes::vector3_type(14.0, 8.0, 0.0);
-    v3 = MyMathTypes::vector3_type(13.0, 9.0, 0.0);
- 
-    render_pipeline.draw_triangle(v1, ZeroNormal, cwhite,
-                                                            v2, ZeroNormal, cwhite,
-                                                            v3, ZeroNormal, cwhite);
- 
-    render_pipeline.draw_debugline(v1, v2, cwhite);
-    render_pipeline.draw_debugline(v2, v3, cwhite);
-    render_pipeline.draw_debugline(v3, v1, cwhite);
- 
-    // Case 3
-    v1 = MyMathTypes::vector3_type(10.0, 6.0, 0.0);
-    v2 = MyMathTypes::vector3_type(11.0, 5.0, 0.0);
-    v3 = MyMathTypes::vector3_type(11.0, 6.0, 0.0);
- 
-    render_pipeline.draw_triangle(v1, ZeroNormal, cwhite,
-                                                            v2, ZeroNormal, cwhite,
-                                                            v3, ZeroNormal, cwhite);
- 
-    render_pipeline.draw_debugline(v1, v2, cwhite);
-    render_pipeline.draw_debugline(v2, v3, cwhite);
-    render_pipeline.draw_debugline(v3, v1, cwhite);
- 
-    // Case 4
-    v1 = MyMathTypes::vector3_type(13.0, 5.0, 0.0);
-    v2 = MyMathTypes::vector3_type(14.0, 6.0, 0.0);
-    v3 = MyMathTypes::vector3_type(13.0, 6.0, 0.0);
- 
-    render_pipeline.draw_triangle(v1, ZeroNormal, cwhite,
-                                                            v2, ZeroNormal, cwhite,
-                                                            v3, ZeroNormal, cwhite);
- 
-    render_pipeline.draw_debugline(v1, v2, cwhite);
-    render_pipeline.draw_debugline(v2, v3, cwhite);
-    render_pipeline.draw_debugline(v3, v1, cwhite);
 
     render_pipeline.unit_length(1);
     render_pipeline.DebugOff();
@@ -1490,55 +1417,6 @@ void Foley_Fig_6_34()
 *                                                                   *
 \*******************************************************************/
 
-void FWDBezierCurve(bezier_curve const& bcurve, int N)
-{
-    typedef typename MyMathTypes::vector3_type vector3_type;
-    typedef typename MyMathTypes::real_type    real_type;
-    //<Declare and Initialize a, b, c, d>
-    vector3_type b1, b2, b3, b4, a, b, c, d;
-    b1 = bcurve[1];
-    b2 = bcurve[2];
-    b3 = bcurve[3];
-    b4 = bcurve[4];
-    a[1] = - b1[1] + 3.0 * b2[1] - 3.0 * b3[1] + b4[1];
-    a[2] = - b1[2] + 3.0 * b2[2] - 3.0 * b3[2] + b4[2];
-    a[3] = - b1[3] + 3.0 * b2[3] - 3.0 * b3[3] + b4[3];
-
-    b[1] = 3.0 * b1[1] - 6.0 * b2[1] + 3.0 * b3[1];
-    b[2] = 3.0 * b1[2] - 6.0 * b2[2] + 3.0 * b3[2];
-    b[3] = 3.0 * b1[3] - 6.0 * b2[3] + 3.0 * b3[3];
-
-    c[1] = - 3.0 * b1[1] + 3.0 * b2[1];
-    c[2] = - 3.0 * b1[2] + 3.0 * b2[2];
-    c[3] = - 3.0 * b1[3] + 3.0 * b2[3];
-
-    d = b1;
-
-
-    //<Declare and Initialize FWDvector>
-    vectorfwd_type FWDvector;
-    real_type delta = 1.0 / static_cast<real_type>(N);
-    real_type delta_2 = delta * delta;
-    real_type delta_3 = delta_2 * delta;
-    FWDvector[1] = d;
-    FWDvector[2] = a * delta_3 + b * delta_2 + c * delta;
-    FWDvector[3] = a * 6.0 * delta_3 + b * 2.0 * delta_2;
-    FWDvector[4] = a * 6.0 * delta_3;
-
-    vector3_type old_point = d;
-    for (real_type t = delta; t < 1.0; t += delta) {
-        FWDvector[1] += FWDvector[2];
-        FWDvector[2] += FWDvector[3];
-        FWDvector[3] += FWDvector[4];
-        vector3_type new_point = FWDvector[1];
-        render_pipeline.draw_line(old_point, cwhite, new_point, cwhite);
-        old_point = new_point;
-    }
-    render_pipeline.draw_line(old_point, cwhite, a + b + c + d, cwhite);
-}
-
-
-
 /*******************************************************************\
 *                                                                   *
 *              D r a w B e z i e r C u r v e F W D ( )              *
@@ -1567,8 +1445,6 @@ void DrawBezierCurveFWD()
     render_pipeline.draw_line(bcurve[3], cred, bcurve[4], cred);
 
     // Now draw the real curve using forward differences.
-    //GO HERE
-    FWDBezierCurve(bcurve, N);
 }
 
 
@@ -1580,69 +1456,11 @@ void DrawBezierCurveFWD()
 
 void SubDivideBezierCurve(MyMathTypes::bezier_curve const& G, int N)
 {
-    typedef typename MyMathTypes::vector3_type   vector3_type;
-    typedef typename MyMathTypes::matrix4x4_type matrix4x4_type;
-    typedef typename MyMathTypes::real_type      real_type;
-    typedef RowVector<vector3_type, 4> bezier_curve;
-    
     render_pipeline.load_rasterizer(line_rasterizer);
     render_pipeline.load_vertex_program(identity_vertex_program);
     render_pipeline.load_fragment_program(identity_fragment_program);
 
     // Subdivide the Bezier curve recursively.
-    matrix4x4_type DBL; 
-    DBL[1][1] = 8; 
-    DBL[1][2] = 4; 
-    DBL[1][3] = 2; 
-    DBL[1][4] = 1;
-
-    DBL[2][1] = 0; 
-    DBL[2][2] = 4; 
-    DBL[2][3] = 4; 
-    DBL[2][4] = 3; 
-
-    DBL[3][1] = 0; 
-    DBL[3][2] = 0; 
-    DBL[3][3] = 2; 
-    DBL[3][4] = 3; 
-
-    DBL[4][1] = 0; 
-    DBL[4][2] = 0; 
-    DBL[4][3] = 0; 
-    DBL[4][4] = 1; 
-    DBL /= 8.0; 
-
-    matrix4x4_type DBR; 
-    DBR[1][1] = 1; 
-    DBR[1][2] = 0; 
-    DBR[1][3] = 0; 
-    DBR[1][4] = 0;
-
-    DBR[2][1] = 3; 
-    DBR[2][2] = 2; 
-    DBR[2][3] = 0; 
-    DBR[2][4] = 0; 
-
-    DBR[3][1] = 3; 
-    DBR[3][2] = 4; 
-    DBR[3][3] = 4; 
-    DBR[3][4] = 0; 
-
-    DBR[4][1] = 1; 
-    DBR[4][2] = 2; 
-    DBR[4][3] = 4; 
-    DBR[4][4] = 8; 
-    DBR /= 8.0; 
-
-    if (N == 0) {
-        render_pipeline.draw_line(G[1], cwhite,
-                                  G[4], cwhite);
-    } else {
-        bezier_curve GBL(G * DBL);
-        SubDivideBezierCurve(GBL, N - 1);
-        bezier_curve GBR(G * DBR);
-        SubDivideBezierCurve(GBR, N - 1);
-    }
 }
 
 
@@ -1704,12 +1522,6 @@ MyMathTypes::real_type const klein_epsilon = 1.0e-4;
 
 #include "solution/kleinbottle.h"
 
-MyMathTypes::real_type pi = atan(1.0)*4;
-MyMathTypes::real_type u_min = 0.0;
-MyMathTypes::real_type u_max = 2*pi;
-MyMathTypes::real_type v_min = 0.0;
-MyMathTypes::real_type v_max = pi;
-
 KleinBottle Klein;
 
 /*******************************************************************\
@@ -1718,48 +1530,12 @@ KleinBottle Klein;
 *                                                                   *
 \*******************************************************************/
 
-void DrawTheKleinBottom(int tes)
+void DrawTheKleinBottom()
 {
-    int N = tes;       // Tesselation in the u-parameter
+    int N = 20;       // Tesselation in the u-parameter
     int M = N / 2;    // Tesselation in the v-parameter
 
-    // Draw the bottom of the Klein bottle
-
-    MyMathTypes::real_type Delta_u = (u_max - u_min) / N;
-    MyMathTypes::real_type Delta_v = (v_max - v_min) / M;
-
-    MyMathTypes::real_type u_current = u_min;
-    MyMathTypes::real_type v_current = v_min;
-    
-    MyMathTypes::vector3_type point_ll;
-    MyMathTypes::vector3_type point_lr;
-    MyMathTypes::vector3_type point_ul;
-    MyMathTypes::vector3_type point_ur;
-    MyMathTypes::vector3_type normal_ll;
-    MyMathTypes::vector3_type normal_lr;
-    MyMathTypes::vector3_type normal_ul;
-    MyMathTypes::vector3_type normal_ur;
-
-    for (u_current = u_min; u_current <= u_max ; u_current+=Delta_u) {
-        for (v_current = v_min ; v_current <= v_max ; v_current+=Delta_v) {
-            point_ll = Klein.BottomVertex(u_current,v_current);
-            normal_ll = Klein.BottomNormal(u_current,v_current);
-            point_ul = Klein.BottomVertex(u_current,v_current+Delta_v);
-            normal_ul = Klein.BottomNormal(u_current,v_current+Delta_v);
-            point_lr = Klein.BottomVertex(u_current+Delta_u,v_current);
-            normal_lr = Klein.BottomNormal(u_current+Delta_u,v_current);
-            point_ur = Klein.BottomVertex(u_current+Delta_u,v_current+Delta_v);
-            normal_ur = Klein.BottomNormal(u_current+Delta_u,v_current+Delta_v);
-
-            // Now we draw !
-            render_pipeline.draw_triangle(point_ll, normal_ll, cgreen,
-                                          point_ul, normal_ul, cgreen,
-                                          point_lr, normal_lr, cgreen);
-            render_pipeline.draw_triangle(point_ul, normal_ul, cgreen,
-                                          point_lr, normal_lr, cgreen,
-                                          point_ur, normal_ur, cgreen);
-        }
-    }
+    // Draw the bottom of the Klein bottle.
 }
 
 
@@ -1769,47 +1545,12 @@ void DrawTheKleinBottom(int tes)
 *                                                                   *
 \*******************************************************************/
 
-void DrawTheKleinHandle(int tes)
+void DrawTheKleinHandle()
 {
-    int N = tes;       // Tesselation in the u-parameter
+    int N = 20;       // Tesselation in the u-parameter
     int M = N / 2;    // Tesselation in the v-parameter
 
     // Draw the handle of the Klein bottle.
-    MyMathTypes::real_type Delta_u = (u_max - u_min) / N;
-    MyMathTypes::real_type Delta_v = (v_max - v_min) / M;
-
-    MyMathTypes::real_type u_current = u_min;
-    MyMathTypes::real_type v_current = v_min;
-    
-    MyMathTypes::vector3_type point_ll;
-    MyMathTypes::vector3_type point_lr;
-    MyMathTypes::vector3_type point_ul;
-    MyMathTypes::vector3_type point_ur;
-    MyMathTypes::vector3_type normal_ll;
-    MyMathTypes::vector3_type normal_lr;
-    MyMathTypes::vector3_type normal_ul;
-    MyMathTypes::vector3_type normal_ur;
-
-    for (u_current = u_min; u_current <= u_max ; u_current+=Delta_u) {
-        for (v_current = v_min ; v_current <= v_max ; v_current+=Delta_v) {
-            point_ll = Klein.HandleVertex(u_current,v_current);
-            normal_ll = Klein.HandleNormal(u_current,v_current);
-            point_ul = Klein.HandleVertex(u_current,v_current+Delta_v);
-            normal_ul = Klein.HandleNormal(u_current,v_current+Delta_v);
-            point_lr = Klein.HandleVertex(u_current+Delta_u,v_current);
-            normal_lr = Klein.HandleNormal(u_current+Delta_u,v_current);
-            point_ur = Klein.HandleVertex(u_current+Delta_u,v_current+Delta_v);
-            normal_ur = Klein.HandleNormal(u_current+Delta_u,v_current+Delta_v);
-
-            // Now we draw !
-            render_pipeline.draw_triangle(point_ll, normal_ll, cgreen,
-                                          point_ul, normal_ul, cgreen,
-                                          point_lr, normal_lr, cgreen);
-            render_pipeline.draw_triangle(point_ul, normal_ul, cgreen,
-                                          point_lr, normal_lr, cgreen,
-                                          point_ur, normal_ur, cgreen);
-        }
-    }
 }
 
 
@@ -1819,47 +1560,12 @@ void DrawTheKleinHandle(int tes)
 *                                                                   *
 \*******************************************************************/
 
-void DrawTheKleinTop(int tes)
+void DrawTheKleinTop()
 {
-    int N = tes;       // Tesselation in the u-parameter
+    int N = 20;       // Tesselation in the u-parameter
     int M = N / 2;    // Tesselation in the v-parameter
 
     // Draw the top of the Klein bottle.
-    MyMathTypes::real_type Delta_u = (u_max - u_min) / N;
-    MyMathTypes::real_type Delta_v = (v_max - v_min) / M;
-
-    MyMathTypes::real_type u_current = u_min;
-    MyMathTypes::real_type v_current = v_min;
-    
-    MyMathTypes::vector3_type point_ll;
-    MyMathTypes::vector3_type point_lr;
-    MyMathTypes::vector3_type point_ul;
-    MyMathTypes::vector3_type point_ur;
-    MyMathTypes::vector3_type normal_ll;
-    MyMathTypes::vector3_type normal_lr;
-    MyMathTypes::vector3_type normal_ul;
-    MyMathTypes::vector3_type normal_ur;
-
-    for (u_current = u_min; u_current <= u_max ; u_current+=Delta_u) {
-        for (v_current = v_min ; v_current <= v_max ; v_current+=Delta_v) {
-            point_ll = Klein.TopVertex(u_current,v_current);
-            normal_ll = Klein.TopNormal(u_current,v_current);
-            point_ul = Klein.TopVertex(u_current,v_current+Delta_v);
-            normal_ul = Klein.TopNormal(u_current,v_current+Delta_v);
-            point_lr = Klein.TopVertex(u_current+Delta_u,v_current);
-            normal_lr = Klein.TopNormal(u_current+Delta_u,v_current);
-            point_ur = Klein.TopVertex(u_current+Delta_u,v_current+Delta_v);
-            normal_ur = Klein.TopNormal(u_current+Delta_u,v_current+Delta_v);
-
-            // Now we draw !
-            render_pipeline.draw_triangle(point_ll, normal_ll, cgreen,
-                                          point_ul, normal_ul, cgreen,
-                                          point_lr, normal_lr, cgreen);
-            render_pipeline.draw_triangle(point_ul, normal_ul, cgreen,
-                                          point_lr, normal_lr, cgreen,
-                                          point_ur, normal_ur, cgreen);
-        }
-    }
 }
 
 
@@ -1869,47 +1575,12 @@ void DrawTheKleinTop(int tes)
 *                                                                   *
 \*******************************************************************/
 
-void DrawTheKleinMiddle(int tes)
+void DrawTheKleinMiddle()
 {
-    int N = tes;       // Tesselation in the u-parameter
+    int N = 20;       // Tesselation in the u-parameter
     int M = N / 2;    // Tesselation in the v-parameter
 
     // Draw the middle of the Klein bottle.
-    MyMathTypes::real_type Delta_u = (u_max - u_min) / N;
-    MyMathTypes::real_type Delta_v = (v_max - v_min) / M;
-
-    MyMathTypes::real_type u_current = u_min;
-    MyMathTypes::real_type v_current = v_min;
-    
-    MyMathTypes::vector3_type point_ll;
-    MyMathTypes::vector3_type point_lr;
-    MyMathTypes::vector3_type point_ul;
-    MyMathTypes::vector3_type point_ur;
-    MyMathTypes::vector3_type normal_ll;
-    MyMathTypes::vector3_type normal_lr;
-    MyMathTypes::vector3_type normal_ul;
-    MyMathTypes::vector3_type normal_ur;
-
-    for (u_current = u_min; u_current <= u_max ; u_current+=Delta_u) {
-        for (v_current = v_min ; v_current <= v_max ; v_current+=Delta_v) {
-            point_ll = Klein.MiddleVertex(u_current,v_current);
-            normal_ll = Klein.MiddleNormal(u_current,v_current);
-            point_ul = Klein.MiddleVertex(u_current,v_current+Delta_v);
-            normal_ul = Klein.MiddleNormal(u_current,v_current+Delta_v);
-            point_lr = Klein.MiddleVertex(u_current+Delta_u,v_current);
-            normal_lr = Klein.MiddleNormal(u_current+Delta_u,v_current);
-            point_ur = Klein.MiddleVertex(u_current+Delta_u,v_current+Delta_v);
-            normal_ur = Klein.MiddleNormal(u_current+Delta_u,v_current+Delta_v);
-
-            // Now we draw !
-            render_pipeline.draw_triangle(point_ll, normal_ll, cgreen,
-                                          point_ul, normal_ul, cgreen,
-                                          point_lr, normal_lr, cgreen);
-            render_pipeline.draw_triangle(point_ul, normal_ul, cgreen,
-                                          point_lr, normal_lr, cgreen,
-                                          point_ur, normal_ur, cgreen);
-        }
-    }
 }
 
 
@@ -1921,10 +1592,7 @@ void DrawTheKleinMiddle(int tes)
 
 void DrawKleinBottle()
 {
-    u_min = 0.0;
-    u_max = 2*pi;
-    v_min = 0.0;
-    v_max = pi;
+
 /*******************************************************************\
 *                                                                   *
 *                V i e w i n g   P a r a m e t e r s                *
@@ -2018,168 +1686,17 @@ void DrawKleinBottle()
     render_pipeline.state().model()     = Z_Rotate(rotation_angle);
     render_pipeline.state().inv_model() = Inv_Z_Rotate(rotation_angle);
 
-    int tesselation = 20; // default: 20 = 1 seconds render time
-                          //         200 = 10-15 seconds rendertome
-    
-    DrawTheKleinBottom(tesselation);
-    DrawTheKleinHandle(tesselation);
-    DrawTheKleinTop(tesselation);
+    DrawTheKleinBottom();
+    DrawTheKleinHandle();
+    DrawTheKleinTop();
     
     if (figure != 'm') {
-	DrawTheKleinMiddle(tesselation);
+	DrawTheKleinMiddle();
     }
 
     render_pipeline.state().model()     = Identity();
     render_pipeline.state().inv_model() = Identity();
 }
-
-
-#include "solution/dini.h"
-
-void DrawDini()
-{
-
-/*******************************************************************\
-*                                                                   *
-*                V i e w i n g   P a r a m e t e r s                *
-*                                                                   *
-\*******************************************************************/
-
-    MyMathTypes::vector3_type VRP(5.0, 0.0, 6.0);
-    MyMathTypes::vector3_type VPN(cos(30.0 * M_PI / 180.0), 0.0, sin(30.0 * M_PI / 180.0));
-    MyMathTypes::vector3_type VUP(0.0, 0.0, 1.0);
-    MyMathTypes::vector3_type PRP(0.0, 0.0, 50.0);
-
-    MyMathTypes::vector2_type lower_left(-10.0, -10.0);
-    MyMathTypes::vector2_type upper_right(10.0, 10.0);
-
-    MyMathTypes::real_type    F =   5.0;
-    MyMathTypes::real_type    B = -15.0;
-    
-    camera.set_projection(VRP, VPN, VUP, PRP,
-			  lower_left, upper_right,
-			  F, B,
-			  winWidth, winHeight);
-
-
-/*******************************************************************\
-*                                                                   *
-*                      L i g h t   S o u r c e                      *
-*                                                                   *
-\*******************************************************************/
-
-    // Set up the Light source parameters in graphics_state
-    MyMathTypes::vector3_type I_a(0.5, 0.5, 0.5);
-    render_pipeline.state().I_a() = I_a;
-
-    // Set up the Light source parameters in graphics_state
-    MyMathTypes::vector3_type I_p(1.0, 1.0, 1.0);
-    MyMathTypes::vector3_type I_p_position(300.0, 300.0, -300.0);
-
-    render_pipeline.state().I_p() = I_p;
-    render_pipeline.state().light_position() = I_p_position;
-
-
-/*******************************************************************\
-*                                                                   *
-*               M a t e r i a l   P r o p e r t i e s               *
-*                                                                   *
-\*******************************************************************/
-
-    MyMathTypes::real_type    k_a = 0.5;
-    MyMathTypes::vector3_type O_a(0.0, 1.0, 0.0);
-
-    MyMathTypes::real_type    k_d = 0.75;
-    MyMathTypes::vector3_type O_d(0.0, 1.0, 0.0);
-
-    MyMathTypes::real_type    k_s = 0.9;
-    MyMathTypes::vector3_type O_s(1.0, 1.0, 1.0);
-
-    MyMathTypes::real_type    n     = 75.0;
-    MyMathTypes::real_type    f_att = 1.0;   // Not used!
-    
-    // Set up the Material parameters
-    render_pipeline.state().ambient_intensity()  = k_a;
-    render_pipeline.state().ambient_color()      = O_a;
-
-    render_pipeline.state().diffuse_intensity()  = k_d;
-    render_pipeline.state().diffuse_color()      = O_d;
-
-    render_pipeline.state().specular_intensity() = k_s;
-    render_pipeline.state().specular_color()     = O_s;
-
-    render_pipeline.state().fall_off() = n;
-
-
-/*******************************************************************\
-*                                                                   *
-*               I n i t i a l i z e   P i p e l i n e               *
-*                                                                   *
-\*******************************************************************/
-
-    render_pipeline.load_rasterizer(triangle_rasterizer);
-    render_pipeline.load_vertex_program(transform_vertex_program);
-    render_pipeline.load_fragment_program(phong_fragment_program);
-
-
-/*******************************************************************\
-*                                                                   *
-*                   D r a w   t h e   B o t t l e                   *
-*                                                                   *
-\*******************************************************************/
-
-    MyMathTypes::real_type rotation_angle = 45.0 * M_PI /  180.0;
-    render_pipeline.state().model()     = Z_Rotate(rotation_angle);
-    render_pipeline.state().inv_model() = Inv_Z_Rotate(rotation_angle);
-
-    int tesselation = 200; // default: 20 = 1 seconds render time
-                          //         200 = x-x seconds rendertome
-    
-    // OBS DRAW DINI HERE
-    Dini dini;
-    dini.init();
-    u_max = 6.0*pi;
-    v_min = 0.001;
-    v_max = 2.0;
-    MyMathTypes::real_type u_current = u_min;
-    MyMathTypes::real_type v_current = v_min;
-    
-    MyMathTypes::vector3_type point_ll;
-    MyMathTypes::vector3_type point_lr;
-    MyMathTypes::vector3_type point_ul;
-    MyMathTypes::vector3_type point_ur;
-    MyMathTypes::vector3_type normal_ll;
-    MyMathTypes::vector3_type normal_lr;
-    MyMathTypes::vector3_type normal_ul;
-    MyMathTypes::vector3_type normal_ur;
-    MyMathTypes::real_type Delta_u = (u_max - u_min)/tesselation;
-    MyMathTypes::real_type Delta_v = (v_max - v_min)/tesselation;
-
-for (u_current = u_min; u_current <= u_max ; u_current+=Delta_u) {
-        for (v_current = v_min ; v_current <= v_max ; v_current+=Delta_v) {
-            point_ll = dini.Vertex(u_current,v_current);
-            normal_ll = dini.Normal(u_current,v_current);
-            point_ul = dini.Vertex(u_current,v_current+Delta_v);
-            normal_ul = dini.Normal(u_current,v_current+Delta_v);
-            point_lr = dini.Vertex(u_current+Delta_u,v_current);
-            normal_lr = dini.Normal(u_current+Delta_u,v_current);
-            point_ur = dini.Vertex(u_current+Delta_u,v_current+Delta_v);
-            normal_ur = dini.Normal(u_current+Delta_u,v_current+Delta_v);
-
-            // Now we draw !
-            render_pipeline.draw_triangle(point_ll, normal_ll, cgreen,
-                                          point_ul, normal_ul, cgreen,
-                                          point_lr, normal_lr, cgreen);
-            render_pipeline.draw_triangle(point_ul, normal_ul, cgreen,
-                                          point_lr, normal_lr, cgreen,
-                                          point_ur, normal_ur, cgreen);
-        }
-    }
-
-    render_pipeline.state().model()     = Identity();
-    render_pipeline.state().inv_model() = Identity();
-}
-
 
 
 /*******************************************************************\
@@ -2312,8 +1829,6 @@ void DrawPhongSurface()
     render_pipeline.load_fragment_program(phong_fragment_program);
 
     // Sample the Phong surface and draw it.
-    PhongSurface phong;
-    
 
     render_pipeline.state().model()     = Identity();
     render_pipeline.state().inv_model() = Identity();
@@ -2336,7 +1851,6 @@ void SubdivideBezierPatch(MyMathTypes::bezier_patch const& Patch, int SubdivLeve
 			  bool InvertNormals, DrawStyle VisualizationStyle)
 {
     // Subdivide the Bezier patch recursively.
-    
 }
 
 
@@ -2460,7 +1974,7 @@ void DrawUTAHTeapot()
 
     std::vector<MyMathTypes::bezier_patch> BezierPatches;
     
-    int fail = ReadBezierPatches("StudentProject/src/data/teapot.data", BezierPatches);
+    int fail = ReadBezierPatches("./src/data/teapot.data", BezierPatches);
     if (fail) {
 	throw std::runtime_error("DrawUTAHTeapot: failed to read the file: ./src/data/teapot.data");
     }
@@ -2472,7 +1986,7 @@ void DrawUTAHTeapot()
     // 		  << std::endl << std::endl;
     // }
 
-    //std::cout << "Draw The Bezier PatKleinches:" << std::endl;
+    //std::cout << "Draw The Bezier Patches:" << std::endl;
     //std::cout << "========================" << std::endl;
 
     std::vector<bool> InvertNormals(BezierPatches.size(), true);
@@ -2595,7 +2109,7 @@ void DrawRocket()
 
     std::vector<MyMathTypes::bezier_patch> BezierPatches;
     
-    int fail = ReadBezierPatches("StudentProject/src/data/rocket.data", BezierPatches);
+    int fail = ReadBezierPatches("./src/data/rocket.data", BezierPatches);
     if (fail) {
 	throw std::runtime_error("DrawRocket: failed to read the file: ./src/data/rocket.data");
     }
@@ -2755,7 +2269,7 @@ void DrawSailboat()
 
     std::vector<MyMathTypes::bezier_patch> BezierPatches;
 
-    int fail = ReadBezierPatches("StudentProject/src/data/patches.data", BezierPatches);
+    int fail = ReadBezierPatches("./src/data/patches.data", BezierPatches);
     if (fail) {
 	throw std::runtime_error("DrawSailboat: failed to read the file: ./src/data/patches.data");
     }
@@ -2914,7 +2428,7 @@ void DrawPain()
 
     std::vector<MyMathTypes::bezier_patch> BezierPatches;
     
-    int fail = ReadBezierPatches("StudentProject/src/data/pain.data", BezierPatches);
+    int fail = ReadBezierPatches("./src/data/pain.data", BezierPatches);
     if (fail) {
 	throw std::runtime_error("DrawPain: failed to read the file: ./src/data/pain.data");
     }
@@ -3519,8 +3033,7 @@ void usage()
     std::cout << "\t---------------------------------" << std::endl << std::flush;
     std::cout << "\tk : Klein Bottle"                  << std::endl << std::flush;
     std::cout << "\tm : Klein Bottle interior"         << std::endl << std::flush;
-    std::cout << "\tx : Phong Surface"                 << std::endl << std::flush;    
-    std::cout << "\ty : Dini surface"                 << std::endl << std::flush;
+    std::cout << "\tx : Phong Surface"                 << std::endl << std::flush;
     std::cout << std::endl << std::flush;
 
     std::cout << "\tDraw Bezier Surfaces:"             << std::endl << std::flush;
@@ -3726,11 +3239,6 @@ void keyboard(unsigned char Key, int Xmouse, int Ymouse)
 	// draw the Phong Surface
 	figure = 'x';
 	glutPostRedisplay();
-	break;    
-    case 'y':
-	// draw the Dini Surface
-	figure = 'y';
-	glutPostRedisplay();
 	break;
     case 'n':
 	// draw UTAH Teapot
@@ -3854,7 +3362,7 @@ void display()
 
 #if DRAWPOINTS
     if (figure == 'p') {
-      DrawPoint();
+	DrawPoint();
     }
 #endif
 
@@ -4059,16 +3567,6 @@ void display()
 
     if (figure == 'x') {
 	DrawPhongSurface();
-    }
-    
-/******************************************************************* \
-*                                                                   *
-*                D r a w D i n i S u r f a c e ( )                  *
-*                                                                   *
-\*******************************************************************/
-
-    if (figure == 'y') {
-	DrawDini();
     }
 
 /*******************************************************************\
@@ -4453,7 +3951,6 @@ void SelectMenuItem(int value)
 void CreateMenu()
 {
     Menu = glutCreateMenu(SelectMenuItem);
-
     glutAddMenuEntry("   Help", 1);
     glutAddMenuEntry("   Quit", 2);
     glutAddMenuEntry("   Clear Screen", 3);
@@ -4525,11 +4022,6 @@ int main( int argc, char **argv )
 	render_pipeline.load_vertex_program( identity_vertex_program );
 	render_pipeline.load_fragment_program( identity_fragment_program );
 
-
-    if (figure == '4') {
-	Foley_Fig_6_22();
-    }
-    
 	// Load the appropriate rasterizer when it is needed,
 	// i.e. render_pipeline.load_rasterizer(line_rasterizer | triangle_rasterizer);
         // old: render_pipeline.load_rasterizer( rasterizer);
@@ -4549,7 +4041,7 @@ int main( int argc, char **argv )
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(keyboard);
-        
+
 	CreateMenu();
 	glutChangeToMenuEntry(1, "-> Help", 1);
 
